@@ -35,29 +35,47 @@ call %VENV_DIR%\Scripts\activate
 
 :menu
 
+echo ==========================
+echo        BuildPY Menu       
+echo ==========================
 echo 1. Generate CMakeLists
 echo 2. Build Project
-echo 3. Exit
-set /p choice=Choose an option (1-3): 
+echo 3. Clear Setup and Build
+echo 4. Exit
+echo ==========================
+set /p choice=Choose an option (1-4): 
+
 
 if "%choice%"=="1" (
     echo Running CMakeLists Generation...
-    py ./.build_app_py --action g --json ./generate.json
+    call :run_python g
     pause
     goto menu
 ) else if "%choice%"=="2" (
     echo Running CMake Build...
-    py ./.build_app_py --action b --json ./build.json
+    call :run_python b
     pause
     goto menu
 ) else if "%choice%"=="3" (
+    echo Running Setup Clear...
+    call :run_python c
+    pause
+    goto menu
+) else if "%choice%"=="4" (
     echo Exiting...
+    goto end
 ) else (
-    echo Invalid choice, please choose between 1-3.
+    echo Invalid choice, please choose between 1-4.
     pause
     goto menu
 )
 
+:: Function to call Python script
+:run_python
+py ./buildpy --action %1 --project ./project --json ./build.json
+exit /b
+
+:end
 call %VENV_DIR%\Scripts\deactivate
 
 cmd /k

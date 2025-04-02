@@ -212,7 +212,6 @@ x64/
 *.lastbuildstate
 *.idb
 *.VC.db
-*.json
 
 # Prerequisites
 *.d

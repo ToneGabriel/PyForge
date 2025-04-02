@@ -1,0 +1,29 @@
+{
+    "build_type": "app",
+
+    "c_compiler_path": "default",
+    "c_standard": 17,
+    "c_standard_required": true,
+    "c_extensions": false,
+
+    "cxx_compiler_path": "none",
+    "cxx_standard": 20,
+    "cxx_standard_required": true,
+    "cxx_extensions": false,
+
+    "cmake_generator": "MinGW Makefiles",
+    "cmake_minimum_required_version":
+    {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+    },
+
+    "project_name": "your_project_name",
+    "project_version":
+    {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+    }
+}
