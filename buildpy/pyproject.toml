@@ -1,0 +1,37 @@
+[build-system]
+requires = [
+    "setuptools",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "buildpy"
+version = "1.0.0"
+description = "Python3 CMake build automation tool."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "numpy",
+    "pytest==7.4.1"
+]
+
+[tool.setuptools]
+packages = { find = {} }
+
+# Status Code
+# 1 - Planning - Project is in the early planning phase.
+# 2 - Pre-Alpha - Very early development, not ready for use.
+# 3 - Alpha - Functional but still unstable, frequent changes expected.
+# 4 - Beta - More stable but may still have bugs; features are being refined.
+# 5 - Production/Stable - Fully stable and ready for production use.
+# 6 - Mature - Well-tested, unlikely to change, actively maintained.
+# 7 - Inactive - No longer maintained or deprecated.

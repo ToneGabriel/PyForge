@@ -24,8 +24,8 @@ if exist %VENV_DIR% (
     echo Upgrading pip...
     py -m pip install --upgrade pip
 
-    echo Installing requirements...
-    py -m pip install -r requirements.txt
+    echo Installing buildpy dependencies...
+    py -m pip install ./buildpy
 
     call %VENV_DIR%\Scripts\deactivate
 )
@@ -36,7 +36,7 @@ call %VENV_DIR%\Scripts\activate
 :menu
 
 echo ==========================
-echo        BuildPY Menu       
+echo        PyForge Menu       
 echo ==========================
 echo 1. Generate CMakeLists
 echo 2. Build Project
