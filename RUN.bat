@@ -25,7 +25,7 @@ if exist %VENV_DIR% (
     py -m pip install --upgrade pip
 
     echo Installing buildpy dependencies...
-    py -m pip install ./buildpy
+    py -m pip install -r requirements.txt
 
     call %VENV_DIR%\Scripts\deactivate
 )

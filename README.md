@@ -15,6 +15,7 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 - **No C compiler**: `none`
 - **Automatically detected**: `auto`
 - **User defined**: `full/path/to/compiler`
+- **Note**: If set to `none`, the other c settings are redundant
 
 ### c_standard
 - **Number for C language standard**: `11`, `17`, `23`
@@ -25,27 +26,27 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 ### c_extensions
 - **Allows compiler-specific extensions**: `true`/`false`
 
-### cxx_compiler_path
+### cpp_compiler_path
 - **No C++ compiler**: `none`
 - **Automatically detected**: `auto`
 - **User defined**: `full/path/to/compiler`
+- **Note**: If set to `none`, the other cpp settings are redundant
 
-### cxx_standard
+### cpp_standard
 - **Number for C++ language standard**: `11`, `14`, `17`, `20`, `23`
 
-### cxx_standard_required
+### cpp_standard_required
 - **Enforces standard compliance**: `true`/`false`
 
-### cxx_extensions
+### cpp_extensions
 - **Allows compiler-specific extensions**: `true`/`false`
 
 ### cmake_generator
 - **Examples**: `MinGW Makefiles`, `Unix Makefiles`, `Ninja`
 - **Note**: The build system must be available on this machine in order to use the generator flag.
 
-### cmake_minimum_required_version
-- **Format**: `{ "major": X, "minor": Y, "patch": Z }`
-- **Note**: The build will fail if the installed CMake version is lower than the specified requirement.
+### cmake_compile_definitions
+- **Define macros at compile time**
 
 ### project_name
 - **Defines the project name**: `your_project_name`

@@ -12,7 +12,7 @@ _EXPECTED_BUILD_JSON_STRUCTURE = {
     "project_path": str,
     "cmake_generator": str,
     "c_compiler_path": str,
-    "cxx_compiler_path": str
+    "cpp_compiler_path": str
 }   # END _EXPECTED_BUILD_JSON_STRUCTURE
 
 _EXPECTED_GENERATOR_JSON_STRUCTURE = {
@@ -36,9 +36,9 @@ _EXPECTED_GENERATOR_JSON_STRUCTURE = {
     "c_standard_required": bool,
     "c_extensions": bool,
 
-    "cxx_standard": int,
-    "cxx_standard_required": bool,
-    "cxx_extensions": bool,
+    "cpp_standard": int,
+    "cpp_standard_required": bool,
+    "cpp_extensions": bool,
     
     "app_directory": str,
     "code_directory": str
@@ -72,7 +72,7 @@ def build_project(json_path: str) -> None:
         project_path: str       = json_data_dict["project_path"]
         cmake_generator: str    = json_data_dict["cmake_generator"]
         c_compiler_path: str    = json_data_dict["c_compiler_path"]
-        cxx_compiler_path: str  = json_data_dict["cxx_compiler_path"]
+        cpp_compiler_path: str  = json_data_dict["cpp_compiler_path"]
 
         # Check project path
         if not os.path.exists(project_path):
@@ -83,12 +83,12 @@ def build_project(json_path: str) -> None:
             os.chdir(project_path)
 
             # Run CMake to configure the project build
-            if not c_compiler_path or not cxx_compiler_path:
+            if not c_compiler_path or not cpp_compiler_path:
                 _run_command(f"cmake -G \"{cmake_generator}\" -B build")
             else:
                 _run_command(f"cmake -G \"{cmake_generator}\"               \
                              -DCMAKE_C_COMPILER=\"{c_compiler_path}\"       \
-                             -DCMAKE_CXX_COMPILER=\"{cxx_compiler_path}\"   \
+                             -DCMAKE_CXX_COMPILER=\"{cpp_compiler_path}\"   \
                              -B build")
 
             # Build the project
@@ -143,15 +143,15 @@ def _write_project(file, project_name: str, project_version: dict):
 
 def _write_language_specifications(file,
                                    c_standard: int, c_standard_required: bool, c_extensions: bool,
-                                   cxx_standard: int, cxx_standard_required: bool, cxx_extensions: bool):
+                                   cpp_standard: int, cpp_standard_required: bool, cpp_extensions: bool):
     file.write( f"# Language Specifications\n")
     file.write( f"set(CMAKE_C_STANDARD {c_standard})\n"
                 f"set(CMAKE_C_STANDARD_REQUIRED {_adapt_to_cmake_bool(c_standard_required)})\n"
                 f"set(CMAKE_C_EXTENSIONS {_adapt_to_cmake_bool(c_extensions)})\n"
 
-                f"set(CMAKE_CXX_STANDARD {cxx_standard})\n"
-                f"set(CMAKE_CXX_STANDARD_REQUIRED {_adapt_to_cmake_bool(cxx_standard_required)})\n"
-                f"set(CMAKE_CXX_EXTENSIONS {_adapt_to_cmake_bool(cxx_extensions)})\n"
+                f"set(CMAKE_cpp_standard {cpp_standard})\n"
+                f"set(CMAKE_cpp_standard_REQUIRED {_adapt_to_cmake_bool(cpp_standard_required)})\n"
+                f"set(CMAKE_cpp_extensions {_adapt_to_cmake_bool(cpp_extensions)})\n"
                 )
     file.write( f"\n")
 
@@ -188,9 +188,9 @@ def generate_cmakelists(json_path: str) -> None:
         c_standard_required: bool               = json_data_dict["c_standard_required"]
         c_extensions: bool                      = json_data_dict["c_extensions"]
         
-        cxx_standard: int                       = json_data_dict["cxx_standard"]
-        cxx_standard_required: bool             = json_data_dict["cxx_standard_required"]
-        cxx_extensions: bool                    = json_data_dict["cxx_extensions"]
+        cpp_standard: int                       = json_data_dict["cpp_standard"]
+        cpp_standard_required: bool             = json_data_dict["cpp_standard_required"]
+        cpp_extensions: bool                    = json_data_dict["cpp_extensions"]
         
         app_directory: str                      = json_data_dict["app_directory"]
         code_directory: str                     = json_data_dict["code_directory"]
@@ -200,7 +200,7 @@ def generate_cmakelists(json_path: str) -> None:
             _write_project(cmake_root_file, project_name, project_version)
             _write_language_specifications(cmake_root_file,
                                            c_standard, c_standard_required, c_extensions,
-                                           cxx_standard, cxx_standard_required, cxx_extensions)
+                                           cpp_standard, cpp_standard_required, cpp_extensions)
             _write_work_variables(cmake_root_file)
             _write_subdirectories(cmake_root_file, code_directory, app_directory)
 
