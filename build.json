@@ -12,7 +12,20 @@
     "cpp_extensions": false,
 
     "cmake_generator": "Ninja",
-    "cmake_compile_definitions": ["DEF_1", "DEF_2"],
+    "cmake_compile_definitions":
+    {
+        "def":
+        [
+            "DEF_1",
+            "DEF_2"
+        ],
+
+        "val":
+        [
+            ["DEF_VAL_EXAMPLE_1", "\"string\""],
+            ["DEF_VAL_EXAMPLE_2", "value"]
+        ]
+    },
 
     "project_name": "your_project_name",
     "project_version":

@@ -1,7 +1,7 @@
 import json
 
 
-__all__ = ["JSONStructureError", "load_and_validate_json"]
+__all__ = ["JSONStructureError", "load"]
 
 
 class JSONStructureError(Exception):
@@ -11,7 +11,7 @@ class JSONStructureError(Exception):
         super().__init__(message)
 
 
-def load_and_validate_json(json_path: str, expected_json_structure:dict) -> dict:
+def load(json_path: str, expected_json_structure:dict) -> dict:
     """
     Loads a JSON file and validates it against an expected schema.
 

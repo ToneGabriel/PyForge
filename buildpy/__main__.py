@@ -1,4 +1,5 @@
 from argparse import ArgumentParser as ap
+import localimpl
 
 
 def _get_parser() -> ap:
@@ -28,18 +29,6 @@ def _get_parser() -> ap:
     return parser
 
 
-def main(options):
-    # Call function based on choice and pass the corresponding json file path
-    if options.action == 'g':
-        # localimpl.generate_cmakelists(options.json)
-        pass
-    elif options.action == 'b':
-        # localimpl.build_project(options.json)
-        pass
-    else:    # options.action == 'c'
-        # clear
-        pass
-
-
 if __name__ == "__main__":
-    main(_get_parser().parse_args())
+    options = _get_parser().parse_args()
+    localimpl.main(options.action, options.project, options.json)
