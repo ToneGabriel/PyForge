@@ -1,2 +1,2 @@
-numpy
+rich
 pytest==7.4.1

@@ -1,21 +1,5 @@
 from argparse import ArgumentParser as ap
-import textwrap
-import localimpl
-
-
-def _print_menu() -> None:
-    print(textwrap.dedent(
-    '''
-    ===============================================
-                        PyForge
-    ===============================================
-    Select an option:
-    1. Generate CMakeLists
-    2. Clear CMakeLists
-    3. Build Project
-    4. Exit"
-    '''
-    ))
+from localimpl import main as run_main_impl
 
 
 def _get_parser() -> ap:
@@ -38,29 +22,6 @@ def _get_parser() -> ap:
     return parser
 
 
-def main(options):
-
-    # TODO
-    options.project
-    options.json
-
-    while True:
-        _print_menu()
-
-        choice = input("Enter your choice (1-4): ")
-
-        if choice == "1":
-            print("Generating CMakeLists...")
-        elif choice == "2":
-            print("Clearing CMakeLists...")
-        elif choice == "3":
-            print("Building Project...")
-        elif choice == "4":
-            print("Exiting... Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please enter a number between 1 and 4.")
-
-
 if __name__ == "__main__":
-    main(_get_parser().parse_args())
+    options = _get_parser().parse_args()
+    run_main_impl(options.project, options.json)
