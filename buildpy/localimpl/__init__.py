@@ -9,7 +9,7 @@ from . import cmake
 from . import jsonvalid
 
 
-MAIN_CONSOLE = Console()
+_MAIN_CONSOLE = Console()
 
 
 _EXPECTED_BUILD_JSON_STRUCTURE = {
@@ -131,7 +131,7 @@ def _run_command(command: str) -> None:
     :raises subprocess.CalledProcessError: if command fails
     """
 
-    MAIN_CONSOLE.print(f"Running command: {command}")
+    _MAIN_CONSOLE.print(f"Running command: {command}")
     subprocess.check_call(command, shell=True)
 
 
@@ -167,7 +167,7 @@ def _build_project(project_path: str, data: BuildDataParser) -> None:
 def main(project_path, json_path) -> None:
     while True:
         try:
-            MAIN_CONSOLE.print(textwrap.dedent(
+            _MAIN_CONSOLE.print(textwrap.dedent(
             '''
             ===============================================
                                 PyForge
@@ -183,26 +183,29 @@ def main(project_path, json_path) -> None:
             choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4"])
 
             if choice == "4":
-                MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
+                _MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
                 return
             else:
                 data = BuildDataParser(json_path)
 
                 if choice == "1":
-                    MAIN_CONSOLE.print("Generating CMakeLists...", style="yellow")
+                    _MAIN_CONSOLE.print("Generating CMakeLists...", style="yellow")
                     _generate_project_cmakelists(project_path, data)
                 elif choice == "2":
-                    MAIN_CONSOLE.print("Clearing CMakeLists...", style="yellow")
+                    _MAIN_CONSOLE.print("Clearing CMakeLists...", style="yellow")
                     _clear_project_cmakelists(project_path)
                 elif choice == "3":
-                    MAIN_CONSOLE.print("Building Project...", style="yellow")
+                    _MAIN_CONSOLE.print("Building Project...", style="yellow")
                     _build_project(project_path, data)
                 else:
-                    MAIN_CONSOLE.print("Invalid choice...", style="red")
+                    _MAIN_CONSOLE.print("Invalid choice...", style="red")
         except Exception as e:
-            MAIN_CONSOLE.print(f"Operation failed: {e}", style="red")
+            _MAIN_CONSOLE.print(f"Operation failed: {e}", style="red")
         else:
-            MAIN_CONSOLE.print("Operation successful!", style="green")
+            _MAIN_CONSOLE.print("Operation successful!", style="green")
         finally:
-            # TODO - ask input to continue
-            pass
+            choice = Prompt.ask("Continue?", choices=["y", "n"])
+
+            if choice == "n":
+                _MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
+                return
