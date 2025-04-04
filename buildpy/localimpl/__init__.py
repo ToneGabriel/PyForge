@@ -123,23 +123,6 @@ class BuildDataParser:
         return self._data["project_version"]["patch"]
 
 
-def _print_menu_and_get_choice() -> str:
-    MAIN_CONSOLE.print(textwrap.dedent(
-    '''
-    ===============================================
-                        PyForge
-    ===============================================
-    Select an option:
-    1. Generate CMakeLists
-    2. Clear CMakeLists
-    3. Build Project
-    4. Exit"
-    '''
-    ))
-
-    return Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4"])
-
-
 def _run_command(command: str) -> None:
     """
     Helper function to run a command in the shell.
@@ -152,10 +135,52 @@ def _run_command(command: str) -> None:
     subprocess.check_call(command, shell=True)
 
 
+def _generate_project_cmakelists(project_path: str, data: BuildDataParser) -> None:
+    cmake.generate_root_cmakelists(
+        project_path,
+        data.cmake_minimum_required_version,
+        data.project_name,
+        data.project_version_major,
+        data.project_version_minor,
+        data.project_version_patch,
+        data.c_standard,
+        data.c_standard_required,
+        data.c_extensions,
+        data.cpp_standard,
+        data.cpp_standard_required,
+        data.cpp_extensions
+    )
+
+    cmake.generate_include_recursive_cmakelists(project_path)
+    cmake.generate_source_recursive_cmakelists(project_path)
+    cmake.generate_app_cmakelists(project_path)
+
+
+def _clear_project_cmakelists(project_path: str) -> None:
+    pass
+
+
+def _build_project(project_path: str, data: BuildDataParser) -> None:
+    pass
+
+
 def main(project_path, json_path) -> None:
     while True:
         try:
-            choice = _print_menu_and_get_choice()
+            MAIN_CONSOLE.print(textwrap.dedent(
+            '''
+            ===============================================
+                                PyForge
+            ===============================================
+            Select an option:
+            1. Generate CMakeLists
+            2. Clear CMakeLists
+            3. Build Project
+            4. Exit"
+            '''
+            ))
+
+            choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4"])
 
             if choice == "4":
                 MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
@@ -165,13 +190,19 @@ def main(project_path, json_path) -> None:
 
                 if choice == "1":
                     MAIN_CONSOLE.print("Generating CMakeLists...", style="yellow")
+                    _generate_project_cmakelists(project_path, data)
                 elif choice == "2":
                     MAIN_CONSOLE.print("Clearing CMakeLists...", style="yellow")
+                    _clear_project_cmakelists(project_path)
                 elif choice == "3":
                     MAIN_CONSOLE.print("Building Project...", style="yellow")
+                    _build_project(project_path, data)
                 else:
                     MAIN_CONSOLE.print("Invalid choice...", style="red")
         except Exception as e:
             MAIN_CONSOLE.print(f"Operation failed: {e}", style="red")
         else:
             MAIN_CONSOLE.print("Operation successful!", style="green")
+        finally:
+            # TODO - ask input to continue
+            pass
