@@ -1,0 +1,28 @@
+{
+    "project_root_directory": "path/to/your/project",
+    "project_type": "app",
+    "project_version":
+    {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+    },
+
+    "c_compiler_path": "path/to/your/c/compiler",
+    "c_standard": 17,
+    "c_standard_required": true,
+    "c_extensions": false,
+
+    "cpp_compiler_path": "path/to/your/cpp/compiler",
+    "cpp_standard": 20,
+    "cpp_standard_required": true,
+    "cpp_extensions": false,
+
+    "cmake_generator": "Ninja",
+    "cmake_compile_definitions":
+    [
+        ["DEF_EXAMPLE", ""],
+        ["DEF_VAL_EXAMPLE", "value"],
+        ["DEF_STR_EXAMPLE", "\"string\""]
+    ]
+}
