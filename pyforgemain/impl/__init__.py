@@ -1,6 +1,7 @@
 import subprocess
 import textwrap
 
+from typing import Callable
 from rich.console import Console
 from rich.prompt import Prompt
 
@@ -163,45 +164,87 @@ def _run_command(command: str) -> None:
 #     pass
 
 
-def main(json_path, zip_structure_path) -> None:
+class MenuOption:
+
+    def __init__(
+            self: object,
+            label: str,
+            action: Callable=None
+            ):
+
+        self._label: str = label
+        self._action: Callable = action
+
+    @property
+    def label(self: object) -> str:
+        return self._label
+    
+    @property
+    def action(self: object) -> Callable:
+        return self._action
+
+
+_MENU_OPTIONS = {
+    "0": MenuOption(
+            label="Setup Project Structure",
+            action=None),
+
+    "1": MenuOption(
+            label="Generate CMakeLists",
+            action=None),
+
+    "2": MenuOption(
+            label="Clear CMakeLists",
+            action=None),
+
+    "3": MenuOption(
+            label="Build Project",
+            action=None),
+
+    "4": MenuOption(
+            label="Exit",
+            action=None),
+}
+
+
+def _build_menu_text_and_keys() -> tuple[str, list[str]]:
+    header = textwrap.dedent(
+    '''
+    ===============================================
+                        PyForge
+    ===============================================
+    Select an option:
+    '''
+    )
+
+    body = ""
+    keys = []
+    for key, option in _MENU_OPTIONS.items():
+        body += f"{key}. {option.label}\n"
+        keys.append(key)
+
+    return (f"{header}\n{body}", keys)
+
+
+def main(json_path: str, zip_structure_path: str) -> None:
+    (menu_text, option_keys) = _build_menu_text_and_keys()
+
     while True:
+        _MAIN_CONSOLE.print(menu_text)
+
+        option: MenuOption = _MENU_OPTIONS[Prompt.ask("Please enter your choice", choices=option_keys)]
+
+        # no function available at option (exit program)
+        if not option.action:
+            _MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
+            return
+
+        # try function
         try:
-            _MAIN_CONSOLE.print(textwrap.dedent(
-            '''
-            ===============================================
-                                PyForge
-            ===============================================
-            Select an option:
-            0. Setup Project Structure
-            1. Generate CMakeLists
-            2. Clear CMakeLists
-            3. Build Project
-            4. Exit"
-            '''
-            ))
+            data = ProjectSetupData(json_path)
 
-            choice = Prompt.ask("Please enter your choice", choices=["0", "1", "2", "3", "4"])
-
-            if choice == "4":
-                _MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
-                return
-            else:
-                data = ProjectSetupData(json_path)
-
-                if choice == "0":
-                    _MAIN_CONSOLE.print("Setting Project Structure...", style="yellow")
-                    structure.setup_project(zip_structure_path, data.project_root_path)
-                elif choice == "1":
-                    _MAIN_CONSOLE.print("Generating CMakeLists...", style="yellow")
-                    # _generate_project_cmakelists(project_path, data)
-                elif choice == "2":
-                    _MAIN_CONSOLE.print("Clearing CMakeLists...", style="yellow")
-                    # _clear_project_cmakelists(project_path)
-                elif choice == "3":
-                    _MAIN_CONSOLE.print("Building Project...", style="yellow")
-                    # _build_project(project_path, data)
-                else:
-                    _MAIN_CONSOLE.print("Invalid choice...", style="red")
+            _MAIN_CONSOLE.print(f"Executing: {option.label}...", style="yellow")
+            option.action()
         except Exception as e:
             _MAIN_CONSOLE.print(f"Operation failed: {e}", style="red")
         else:
