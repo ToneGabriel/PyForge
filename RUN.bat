@@ -47,7 +47,7 @@ echo [INFO] Activating environment and running build...
 
 call %VENV_DIR%\Scripts\activate
 
-py ./pyforgemain --json ./setup.json
+py ./pyforgemain --json ./setup.json --structure ./structure.zip
 
 call %VENV_DIR%\Scripts\deactivate
 

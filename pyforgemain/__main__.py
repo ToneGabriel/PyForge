@@ -12,10 +12,16 @@ def _get_parser() -> ap:
                         required=True,
                         help="Path to the setup JSON file"
                         )
+    
+    parser.add_argument("--structure",
+                        type=str,
+                        required=True,
+                        help="Path to the project structure .zip file"
+                        )
 
     return parser
 
 
 if __name__ == "__main__":
     options = _get_parser().parse_args()
-    run_main_impl(options.json)
+    run_main_impl(options.json, options.structure)

@@ -9,14 +9,13 @@ class ProjectStructureError(Exception):
         super().__init__(message)
 
 
-def _check_folder_empty(folder_path: str) -> bool:
+def _check_folder(folder_path: str) -> bool:
     if any(os.scandir(folder_path)):
         raise ProjectStructureError(f"Folder not empty: {folder_path}")
 
 
-def setup_project_structure(zip_structure_path: str, project_dir: str) -> None:
-    _check_folder_empty(project_dir)
+def setup_project(zip_structure_path: str, project_root_path: str) -> None:
+    _check_folder(project_root_path)
 
     with zipfile.ZipFile(zip_structure_path, 'r') as zip_ref:
-        zip_ref.extractall(project_dir)
-
+        zip_ref.extractall(project_root_path)

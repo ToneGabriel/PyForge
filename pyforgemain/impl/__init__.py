@@ -1,6 +1,5 @@
 import subprocess
 import textwrap
-import os
 
 from rich.console import Console
 from rich.prompt import Prompt
@@ -14,109 +13,113 @@ _MAIN_CONSOLE = Console()
 
 
 _EXPECTED_BUILD_JSON_STRUCTURE = {
-    "project_root_directory": str,
-    "project_type": str,
-    "project_version":
+    "project_settings":
     {
-        "major": int,
-        "minor": int,
-        "patch": int
+        "root": str,
+        "build": str,
+        "version":
+        {
+            "major": int,
+            "minor": int,
+            "patch": int
+        }
     },
 
-    "c_compiler_path": str,
-    "c_standard": int,
-    "c_standard_required": bool,
-    "c_extensions": bool,
+    "c_settings":
+    {
+        "compiler_path": str,
+        "compiler_extensions_required": bool,
+        "language_standard": int,
+        "language_standard_required": bool
+    },
 
-    "cpp_compiler_path": str,
-    "cpp_standard": int,
-    "cpp_standard_required": bool,
-    "cpp_extensions": bool,
+    "cpp_settings":
+    {
+        "compiler_path": str,
+        "compiler_extensions_required": bool,
+        "language_standard": int,
+        "language_standard_required": bool
+    },
 
-    "cmake_generator": str,
-    "cmake_compile_definitions": list
+    "cmake_settings":
+    {
+        "generator": str,
+        "compile_definitions": list
+    }
 }   # END _EXPECTED_BUILD_JSON_STRUCTURE
 
 
 class ProjectSetupData:
     '''Description'''
 
-    _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
+    _CMAKE_MINIMUM_REQUIRED_VERSION: str = "3.22.1"
 
     def __init__(self: object, json_path: str):
         self._data = jsonvalid.load(json_path, _EXPECTED_BUILD_JSON_STRUCTURE)
 
-    # @property
-    # def cmake_minimum_required_version(self: object) -> str:
-    #     return ProjectSetupData._CMAKE_MINIMUM_REQUIRED_VERSION
+    @property
+    def cmake_minimum_required_version(self: object) -> str:
+        return ProjectSetupData._CMAKE_MINIMUM_REQUIRED_VERSION
+
+    @property
+    def project_root_path(self: object) -> str:
+        return self._data["project_settings"]["root"]
+
+    @property
+    def build_type(self: object) -> str:
+        return self._data["project_settings"]["build"]
+
+    @property
+    def project_version_major(self: object) -> int:
+        return self._data["project_settings"]["version"]["major"]
     
-    # @property
-    # def project_directory_path(self: object) -> str:
-    #     return self._project_dir_path
-
-    # @property
-    # def build_type(self: object) -> str:
-    #     return self._data["build_type"]
+    @property
+    def project_version_minor(self: object) -> int:
+        return self._data["project_settings"]["version"]["minor"]
     
-    # @property
-    # def c_compiler_path(self: object) -> str:
-    #     return self._data["c_compiler_path"]
+    @property
+    def project_version_patch(self: object) -> int:
+        return self._data["project_settings"]["version"]["patch"]
 
-    # @property
-    # def c_standard(self: object) -> int:
-    #     return self._data["c_standard"]
+    @property
+    def c_compiler_path(self: object) -> str:
+        return self._data["c_settings"]["compiler_path"]
 
-    # @property
-    # def c_standard_required(self: object) -> bool:
-    #     return self._data["c_standard_required"]
-    
-    # @property
-    # def c_extensions(self: object) -> bool:
-    #     return self._data["c_extensions"]
+    @property
+    def c_compiler_extensions_required(self: object) -> bool:
+        return self._data["c_settings"]["compiler_extensions_required"]
 
-    # @property
-    # def cpp_compiler_path(self: object) -> str:
-    #     return self._data["cpp_compiler_path"]
+    @property
+    def c_language_standard(self: object) -> int:
+        return self._data["c_settings"]["language_standard"]
 
-    # @property
-    # def cpp_standard(self: object) -> int:
-    #     return self._data["cpp_standard"]
+    @property
+    def c_language_standard_required(self: object) -> bool:
+        return self._data["c_settings"]["language_standard_required"]
 
-    # @property
-    # def cpp_standard_required(self: object) -> bool:
-    #     return self._data["cpp_standard_required"]
+    @property
+    def cpp_compiler_path(self: object) -> str:
+        return self._data["cpp_settings"]["compiler_path"]
 
-    # @property
-    # def cpp_extensions(self: object) -> bool:
-    #     return self._data["cpp_extensions"]
+    @property
+    def cpp_compiler_extensions_required(self: object) -> bool:
+        return self._data["cpp_settings"]["compiler_extensions_required"]
 
-    # @property
-    # def cmake_generator(self: object) -> str:
-    #     return self._data["cmake_generator"]
+    @property
+    def cpp_language_standard(self: object) -> int:
+        return self._data["cpp_settings"]["language_standard"]
 
-    # @property
-    # def cmake_compile_definitions_def(self: object) -> list[str]:
-    #     return self._data["cmake_compile_definitions"]["def"]
+    @property
+    def cpp_language_standard_required(self: object) -> bool:
+        return self._data["cpp_settings"]["language_standard_required"]
 
-    # @property
-    # def cmake_compile_definitions_val(self: object) -> list[tuple[str, str]]:
-    #     return self._data["cmake_compile_definitions"]["val"]
+    @property
+    def cmake_generator(self: object) -> str:
+        return self._data["cmake_settings"]["generator"]
 
-    # @property
-    # def project_name(self: object) -> str: 
-    #     return self._data["project_name"]
-
-    # @property
-    # def project_version_major(self: object) -> int:
-    #     return self._data["project_version"]["major"]
-
-    # @property
-    # def project_version_minor(self: object) -> int:
-    #     return self._data["project_version"]["minor"]
-
-    # @property
-    # def project_version_patch(self: object) -> int:
-    #     return self._data["project_version"]["patch"]
+    @property
+    def cmake_compile_definitions(self: object) -> list[tuple[str, str]]:
+        return self._data["cmake_settings"]["compile_definitions"]
 
 
 def _run_command(command: str) -> None:
@@ -160,7 +163,7 @@ def _run_command(command: str) -> None:
 #     pass
 
 
-def main(json_path) -> None:
+def main(json_path, zip_structure_path) -> None:
     while True:
         try:
             _MAIN_CONSOLE.print(textwrap.dedent(
@@ -187,7 +190,7 @@ def main(json_path) -> None:
 
                 if choice == "0":
                     _MAIN_CONSOLE.print("Setting Project Structure...", style="yellow")
-                    # structure.setup_project_structure("./structure.zip", "./test")
+                    structure.setup_project(zip_structure_path, data.project_root_path)
                 elif choice == "1":
                     _MAIN_CONSOLE.print("Generating CMakeLists...", style="yellow")
                     # _generate_project_cmakelists(project_path, data)
