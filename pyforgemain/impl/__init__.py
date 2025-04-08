@@ -169,6 +169,7 @@ def main(json_path) -> None:
                                 PyForge
             ===============================================
             Select an option:
+            0. Setup Project Structure
             1. Generate CMakeLists
             2. Clear CMakeLists
             3. Build Project
@@ -176,7 +177,7 @@ def main(json_path) -> None:
             '''
             ))
 
-            choice = Prompt.ask("Please enter your choice", choices=["1", "2", "3", "4"])
+            choice = Prompt.ask("Please enter your choice", choices=["0", "1", "2", "3", "4"])
 
             if choice == "4":
                 _MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
@@ -184,7 +185,10 @@ def main(json_path) -> None:
             else:
                 data = ProjectSetupData(json_path)
 
-                if choice == "1":
+                if choice == "0":
+                    _MAIN_CONSOLE.print("Setting Project Structure...", style="yellow")
+                    # structure.setup_project_structure("./structure.zip", "./test")
+                elif choice == "1":
                     _MAIN_CONSOLE.print("Generating CMakeLists...", style="yellow")
                     # _generate_project_cmakelists(project_path, data)
                 elif choice == "2":
