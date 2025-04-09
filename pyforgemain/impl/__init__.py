@@ -117,15 +117,30 @@ class Forger:
     def __init__(self: object, json_path: str, zip_structure_path: str):
         self._project_setup_data = _ProjectSetupData(json_path)
         self._zip_structure_path = zip_structure_path
-    
+
     def setup_project_structure(self: object) -> None:
         structure.setup_project(self._zip_structure_path, self._project_setup_data.project_root_path)
 
     def generate_cmakelists(self: object) -> None:
-        pass
+        cmake.generate(self._project_setup_data.project_root_path,
+                       self._project_setup_data.cmake_minimum_required_version,
+                       self._project_setup_data.build_type,
+                       self._project_setup_data.project_version_major,
+                       self._project_setup_data.project_version_minor,
+                       self._project_setup_data.project_version_patch,
+                       self._project_setup_data.c_language_standard,
+                       self._project_setup_data.c_language_standard_required,
+                       self._project_setup_data.c_compiler_extensions_required,
+                       self._project_setup_data.cpp_language_standard,
+                       self._project_setup_data.cpp_language_standard_required,
+                       self._project_setup_data.cpp_compiler_extensions_required,
+                       self._project_setup_data.cmake_compile_definitions,
+                       )
 
-    def clear_cmakelists(self: object) -> None:
-        pass
-
-    def build_project(self: object) -> None:
-        pass
+    def build_project(self: object, clean: bool=False) -> None:
+        cmake.build(self._project_setup_data.project_root_path,
+                    self._project_setup_data.cmake_generator,
+                    self._project_setup_data.c_compiler_path,
+                    self._project_setup_data.cpp_compiler_path,
+                    clean
+                    )

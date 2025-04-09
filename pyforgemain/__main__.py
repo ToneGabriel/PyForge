@@ -47,38 +47,32 @@ class MenuOption:
         return self._action
 
 
-def _setup_project_structure(forger: Forger) -> None:
+def _setup_project_structure_menu_map_help(forger: Forger) -> None:
     forger.setup_project_structure()
 
 
-def _generate_cmakelists(forger: Forger) -> None:
+def _build_project_menu_map_help(forger: Forger) -> None:
     forger.generate_cmakelists()
-
-
-def _clear_cmakelists(forger: Forger) -> None:
-    forger.clear_cmakelists()
-
-
-def _build_project(forger: Forger) -> None:
     forger.build_project()
 
 
-_MENU_OPTIONS = {
-    "0": MenuOption(
-            label="Setup Project Structure",
-            action=_setup_project_structure),
+def _build_project_clean_menu_map_help(forger: Forger) -> None:
+    forger.generate_cmakelists()
+    forger.build_project(clean=True)
 
+
+_MENU_OPTIONS = {
     "1": MenuOption(
-            label="Generate CMakeLists",
-            action=_generate_cmakelists),
+            label="Setup Project Structure",
+            action=_setup_project_structure_menu_map_help),
 
     "2": MenuOption(
-            label="Clear CMakeLists",
-            action=_clear_cmakelists),
+            label="Build Project",
+            action=_build_project_menu_map_help),
 
     "3": MenuOption(
-            label="Build Project",
-            action=_build_project),
+            label="Build Project Clean",
+            action=_build_project_clean_menu_map_help),
 
     "4": MenuOption(
             label="Exit",
