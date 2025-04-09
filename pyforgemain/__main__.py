@@ -1,11 +1,17 @@
-from argparse import ArgumentParser as ap
-from impl import main as run_main_impl
+from argparse import ArgumentParser
+from typing import Callable
+from rich.console import Console
+from rich.prompt import Prompt
+
+import textwrap
+
+from impl import Forger
 
 
-def _get_parser() -> ap:
-    parser = ap(description="Arguments to generate and/or build a C/C++ project with CMake.",
-                conflict_handler="resolve"
-                )
+def _get_parser() -> ArgumentParser:
+    parser = ArgumentParser(description="Arguments to generate and/or build a C/C++ project with CMake.",
+                            conflict_handler="resolve"
+                            )
 
     parser.add_argument("--json",
                         type=str,
@@ -22,6 +28,112 @@ def _get_parser() -> ap:
     return parser
 
 
+class MenuOption:
+    def __init__(
+            self: object,
+            label: str,
+            action: Callable=None
+            ):
+
+        self._label: str = label
+        self._action: Callable = action
+
+    @property
+    def label(self: object) -> str:
+        return self._label
+    
+    @property
+    def action(self: object) -> Callable:
+        return self._action
+
+
+def _setup_project_structure(forger: Forger) -> None:
+    forger.setup_project_structure()
+
+
+def _generate_cmakelists(forger: Forger) -> None:
+    forger.generate_cmakelists()
+
+
+def _clear_cmakelists(forger: Forger) -> None:
+    forger.clear_cmakelists()
+
+
+def _build_project(forger: Forger) -> None:
+    forger.build_project()
+
+
+_MENU_OPTIONS = {
+    "0": MenuOption(
+            label="Setup Project Structure",
+            action=_setup_project_structure),
+
+    "1": MenuOption(
+            label="Generate CMakeLists",
+            action=_generate_cmakelists),
+
+    "2": MenuOption(
+            label="Clear CMakeLists",
+            action=_clear_cmakelists),
+
+    "3": MenuOption(
+            label="Build Project",
+            action=_build_project),
+
+    "4": MenuOption(
+            label="Exit",
+            action=None),
+}
+
+
+def _build_menu_text_and_keys() -> tuple[str, list[str]]:
+    header = textwrap.dedent(
+    '''
+    ===============================================
+                        PyForge
+    ===============================================
+    Select an option:
+    '''
+    )
+
+    body = ""
+    keys = []
+    for key, option in _MENU_OPTIONS.items():
+        body += f"{key}. {option.label}\n"
+        keys.append(key)
+
+    return (f"{header}\n{body}", keys)
+
+
+def main(args) -> None:
+    MAIN_CONSOLE = Console()
+    (menu_text, option_keys) = _build_menu_text_and_keys()
+
+    while True:
+        MAIN_CONSOLE.print(menu_text)
+
+        option = _MENU_OPTIONS[Prompt.ask("Please enter your choice", choices=option_keys)]
+
+        # no function available at option (exit program)
+        if not option.action:
+            MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
+            return
+
+        # try action
+        try:
+            forger = Forger(args.json, args.structure)
+
+            MAIN_CONSOLE.print(f"Executing: {option.label}...", style="yellow")
+            option.action(forger)
+        except Exception as e:
+            MAIN_CONSOLE.print(f"Operation failed: {e}", style="red")
+        else:
+            MAIN_CONSOLE.print("Operation successful!", style="green")
+
+        if Prompt.ask("Continue?", choices=["y", "n"]) == "n":
+            MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
+            return
+
+
 if __name__ == "__main__":
-    options = _get_parser().parse_args()
-    run_main_impl(options.json, options.structure)
+    main(_get_parser().parse_args())

@@ -1,4 +1,5 @@
 # import os
+# import subprocess
 
 
 # __all__ = ["build_project", "generate_cmakelists"]
@@ -139,3 +140,14 @@
 
 # def generate_app_cmakelists(project_root_dir: str) -> None:
 #     pass
+
+
+# def _run_command(command: str) -> None:
+#     """
+#     Helper function to run a command in the shell.
+    
+#     :param command: executes command in the shell.
+#     :raises subprocess.CalledProcessError: if command fails
+#     """
+
+#     subprocess.check_call(command, shell=True)
