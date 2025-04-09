@@ -94,17 +94,6 @@ def _write_destination_specifications(file) -> None:
 #     file.write( f"\n")
 
 
-def _run_command(command: str) -> None:
-    """
-    Helper function to run a command in the shell.
-    
-    :param command: executes command in the shell.
-    :raises subprocess.CalledProcessError: if command fails
-    """
-
-    subprocess.check_call(command, shell=True)
-
-
 def generate(
         project_root_path: str,
         cmake_minimum_required_version: str,
@@ -147,15 +136,15 @@ def build(
         if os.path.exists(build_path) and os.path.isdir(build_path):
             shutil.rmtree(build_path)
 
-    cmd_generate_text = f"cmake -S {project_root_path} -G {cmake_generator} -B {build_path}"
+    cmd_generate_text = f"cmake -S \"{project_root_path}\" -G \"{cmake_generator}\" -B \"{build_path}\""
 
     if c_compiler_path:
-        cmd_generate_text += f" -DCMAKE_C_COMPILER={c_compiler_path}"
-    
+        cmd_generate_text += f" -D CMAKE_C_COMPILER=\"{c_compiler_path}\""
+
     if cpp_compiler_path:
-        cmd_generate_text += f" -DCMAKE_C_COMPILER={cpp_compiler_path}"
+        cmd_generate_text += f" -D CMAKE_CXX_COMPILER=\"{cpp_compiler_path}\""
 
-    cmd_build_text = f"cmake --build {build_path}"
+    cmd_build_text = f"cmake --build \"{build_path}\""
 
-    _run_command(cmd_generate_text)
-    _run_command(cmd_build_text)
+    subprocess.check_call(cmd_generate_text, shell=True)
+    subprocess.check_call(cmd_build_text, shell=True)
