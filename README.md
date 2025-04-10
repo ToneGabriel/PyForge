@@ -7,6 +7,7 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 
 ### project_settings
 - **root**: Full path to your C/C++ project root folder
+- **name**: Name of executable and library will be based on this
 - **build**: Project type. Choose from the following
     - **`app`**: Standalone application (`.exe`)
     - **`lib`**: Static library (`.a`)

@@ -7,6 +7,7 @@ _EXPECTED_BUILD_JSON_STRUCTURE = {
     "project_settings":
     {
         "root": str,
+        "name": str,
         "build": str,
         "version":
         {
@@ -57,7 +58,11 @@ class _ProjectSetupData:
         return self._data["project_settings"]["root"]
 
     @property
-    def build_type(self: object) -> str:
+    def project_name(self: object) -> str:
+        return self._data["project_settings"]["name"]
+
+    @property
+    def project_build_type(self: object) -> str:
         return self._data["project_settings"]["build"]
 
     @property
@@ -122,20 +127,22 @@ class Forger:
         structure.setup_project(self._zip_structure_path, self._project_setup_data.project_root_path)
 
     def generate_cmakelists(self: object) -> None:
-        cmake.generate(self._project_setup_data.project_root_path,
-                       self._project_setup_data.cmake_minimum_required_version,
-                       self._project_setup_data.build_type,
-                       self._project_setup_data.project_version_major,
-                       self._project_setup_data.project_version_minor,
-                       self._project_setup_data.project_version_patch,
-                       self._project_setup_data.c_language_standard,
-                       self._project_setup_data.c_language_standard_required,
-                       self._project_setup_data.c_compiler_extensions_required,
-                       self._project_setup_data.cpp_language_standard,
-                       self._project_setup_data.cpp_language_standard_required,
-                       self._project_setup_data.cpp_compiler_extensions_required,
-                       self._project_setup_data.cmake_compile_definitions,
-                       )
+        cmake.generate(
+            cmake_minimum_required_version=self._project_setup_data.cmake_minimum_required_version,
+            project_root_path=self._project_setup_data.project_root_path,
+            project_name=self._project_setup_data.project_name,
+            project_build_type=self._project_setup_data.project_build_type,
+            project_version_major=self._project_setup_data.project_version_major,
+            project_version_minor=self._project_setup_data.project_version_minor,
+            project_version_patch=self._project_setup_data.project_version_patch,
+            c_language_standard=self._project_setup_data.c_language_standard,
+            c_language_standard_required=self._project_setup_data.c_language_standard_required,
+            c_compiler_extensions_required=self._project_setup_data.c_compiler_extensions_required,
+            cpp_language_standard=self._project_setup_data.cpp_language_standard,
+            cpp_language_standard_required=self._project_setup_data.cpp_language_standard_required,
+            cpp_compiler_extensions_required=self._project_setup_data.cpp_compiler_extensions_required,
+            cmake_compile_definitions=self._project_setup_data.cmake_compile_definitions,
+        )
 
     def build_project(self: object, clean: bool=False) -> None:
         cmake.build(self._project_setup_data.project_root_path,

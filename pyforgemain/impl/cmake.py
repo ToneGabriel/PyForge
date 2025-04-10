@@ -6,6 +6,11 @@ import subprocess
 # __all__ = ["build_project", "generate_cmakelists"]
 
 
+# _PROJECT_EXECUTABLE_CMAKE_VAR_NAME = "PROJECT_EXECUTABLE_NAME"
+# _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME = "PROJECT_STATIC_LIBRARY_NAME"
+# _PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME = "PROJECT_SHARED_LIBRARY_NAME"
+
+
 # # def _list_folder_contents(directory, indent=0):
 # #     try:
 # #         with os.scandir(directory) as entries:
@@ -47,11 +52,12 @@ def _write_cmake_minimum_required_version(
 
 def _write_project_specifications(
         file,
+        project_name: str,
         project_version_major: int,
         project_version_minor: int,
         project_version_patch: int
 ) -> None:
-    file.write( f"project(pyforge_PROJECT "
+    file.write( f"project({project_name} "
                 f"VERSION {project_version_major}.{project_version_minor}.{project_version_patch} "
                 f"LANGUAGES C CXX)\n"
                 )
@@ -95,32 +101,29 @@ def _write_destination_specifications(file) -> None:
 
 
 def generate(
-        project_root_path: str,
         cmake_minimum_required_version: str,
-        build_type: str,
+        project_root_path: str,
+        project_name: str,
+        project_build_type: str,
         project_version_major: int,
         project_version_minor: int,
         project_version_patch: str,
-        c_standard: int,
-        c_standard_required: bool,
-        c_extensions: bool,
-        cpp_standard: int,
-        cpp_standard_required: bool,
-        cpp_extensions: bool,
+        c_language_standard: int,
+        c_language_standard_required: bool,
+        c_compiler_extensions_required: bool,
+        cpp_language_standard: int,
+        cpp_language_standard_required: bool,
+        cpp_compiler_extensions_required: bool,
         cmake_compile_definitions: list
 ) -> None:
     with open(_get_cmakelists_file(project_root_path), "w") as cmakelists_root_file:
         _write_cmake_minimum_required_version(cmakelists_root_file, cmake_minimum_required_version)
-        _write_project_specifications(cmakelists_root_file,
+        _write_project_specifications(cmakelists_root_file, project_name,
                                       project_version_major, project_version_minor, project_version_patch)
         _write_language_specifications( cmakelists_root_file,
-                                        c_standard, c_standard_required, c_extensions,
-                                        cpp_standard, cpp_standard_required, cpp_extensions)
+                                        c_language_standard, c_language_standard_required, c_compiler_extensions_required,
+                                        cpp_language_standard, cpp_language_standard_required, cpp_compiler_extensions_required)
         _write_destination_specifications(cmakelists_root_file)
-
-
-def clear(project_root_path: str) -> None:
-    os.remove(_get_cmakelists_file(project_root_path))
 
 
 def build(

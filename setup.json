@@ -2,6 +2,7 @@
     "project_settings":
     {
         "root": "path/to/your/project/root/folder",
+        "name": "your_project_name",
         "build": "app",
         "version":
         {
