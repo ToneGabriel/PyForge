@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 
+from abc import ABC, abstractmethod
 
 # __all__ = ["build_project", "generate_cmakelists"]
 
@@ -27,69 +28,8 @@ import subprocess
 # #         print("  " * indent + "[Permission Denied]")
 
 
-def _get_build_path(project_root_path: str) -> str:
-    return os.path.join(project_root_path, "build")
-
-
-def _get_cmakelists_file(project_root_path: str) -> str:
-    return os.path.join(project_root_path, "CMakeLists.txt")
-
-
 def _adapt_to_cmake_bool(value: bool) -> str:
     return "ON" if value else "OFF"
-
-
-def _write_cmake_minimum_required_version(
-        file,
-        cmake_minimum_required_version: str
-) -> None:
-    file.write( f"cmake_minimum_required(VERSION "
-                f"{cmake_minimum_required_version} "
-                f"FATAL_ERROR)\n"
-                )
-    file.write( f"\n")
-
-
-def _write_project_specifications(
-        file,
-        project_name: str,
-        project_version_major: int,
-        project_version_minor: int,
-        project_version_patch: int
-) -> None:
-    file.write( f"project({project_name} "
-                f"VERSION {project_version_major}.{project_version_minor}.{project_version_patch} "
-                f"LANGUAGES C CXX)\n"
-                )
-    file.write( f"\n")
-
-
-def _write_language_specifications(
-        file,
-        c_standard: int,
-        c_standard_required: bool,
-        c_extensions: bool,
-        cpp_standard: int,
-        cpp_standard_required: bool,
-        cpp_extensions: bool
-) -> None:
-    file.write( f"set(CMAKE_C_STANDARD {c_standard})\n"
-                f"set(CMAKE_C_STANDARD_REQUIRED {_adapt_to_cmake_bool(c_standard_required)})\n"
-                f"set(CMAKE_C_EXTENSIONS {_adapt_to_cmake_bool(c_extensions)})\n\n"
-
-                f"set(CMAKE_cpp_standard {cpp_standard})\n"
-                f"set(CMAKE_cpp_standard_REQUIRED {_adapt_to_cmake_bool(cpp_standard_required)})\n"
-                f"set(CMAKE_cpp_extensions {_adapt_to_cmake_bool(cpp_extensions)})\n"
-                )
-    file.write( f"\n")
-
-
-def _write_destination_specifications(file) -> None:
-    file.write(f"set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/bin)\n"
-               f"set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib)\n"
-               f"set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib)\n"
-               )
-    file.write( f"\n")
 
 
 # def _write_work_variables(file):
@@ -98,6 +38,134 @@ def _write_destination_specifications(file) -> None:
 #                 f"set(CURRENT_DIRECTORY \"./\")\n"
 #                )
 #     file.write( f"\n")
+
+
+class _IGeneratorPart(ABC):
+    @abstractmethod
+    def generate(self: object, file) -> None:
+        pass
+
+
+class _HeaderGeneratorPart(_IGeneratorPart):
+    def __init__(
+            self: object,
+            cmake_minimum_required_version: str,
+            project_name: str,
+            project_version_major: int,
+            project_version_minor: int,
+            project_version_patch: str,
+            c_language_standard: int,
+            c_language_standard_required: bool,
+            c_compiler_extensions_required: bool,
+            cpp_language_standard: int,
+            cpp_language_standard_required: bool,
+            cpp_compiler_extensions_required: bool
+    ):
+        self._cmake_minimum_required_version = cmake_minimum_required_version
+        self._project_name = project_name
+        self._project_version_major = project_version_major
+        self._project_version_minor = project_version_minor
+        self._project_version_patch = project_version_patch
+        self._c_language_standard = c_language_standard
+        self._c_language_standard_required = c_language_standard_required
+        self._c_compiler_extensions_required = c_compiler_extensions_required
+        self._cpp_language_standard = cpp_language_standard
+        self._cpp_language_standard_required = cpp_language_standard_required
+        self._cpp_compiler_extensions_required = cpp_compiler_extensions_required
+
+    def generate(self: object, file):
+        self._write_cmake_minimum_required_version(file)
+        self._write_project_specifications(file)
+        self._write_language_specifications(file)
+        self._write_destination_specifications(file)
+
+    def _write_cmake_minimum_required_version(self: object, file) -> None:
+        file.write( f"cmake_minimum_required(VERSION "
+                    f"{self._cmake_minimum_required_version} "
+                    f"FATAL_ERROR)\n"
+                    )
+        file.write( f"\n")
+
+    def _write_project_specifications(self: object, file) -> None:
+        file.write( f"project({self._project_name} "
+                    f"VERSION {self._project_version_major}.{self._project_version_minor}.{self._project_version_patch} "
+                    f"LANGUAGES C CXX)\n"
+                    )
+        file.write( f"\n")
+
+    def _write_language_specifications(self: object, file) -> None:
+        file.write( f"set(CMAKE_C_STANDARD {self._c_language_standard})\n"
+                    f"set(CMAKE_C_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._c_language_standard_required)})\n"
+                    f"set(CMAKE_C_EXTENSIONS {_adapt_to_cmake_bool(self._c_compiler_extensions_required)})\n\n"
+
+                    f"set(CMAKE_cpp_standard {self._cpp_language_standard})\n"
+                    f"set(CMAKE_cpp_standard_REQUIRED {_adapt_to_cmake_bool(self._cpp_language_standard_required)})\n"
+                    f"set(CMAKE_cpp_extensions {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n"
+                    )
+        file.write( f"\n")
+
+    def _write_destination_specifications(self: object, file) -> None:
+        file.write( f"set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/bin)\n"
+                    f"set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib)\n"
+                    f"set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib)\n"
+                    )
+        file.write( f"\n")
+
+
+class _Generator:
+    def __init__(self: object):
+        self._parts: list[_IGeneratorPart] = []
+
+    def generate(self: object, file) -> None:
+        for part in self._parts:
+            part.generate(file)
+
+    def ready(self: object) -> bool:
+        return self._parts.count() > 0
+
+    def reset(self: object) -> None:
+        self._parts.clear()
+
+    def add_part(self: object, part: _IGeneratorPart) -> None:
+        self._parts.append(part)
+
+
+class _GeneratorBuilder:
+    def __init__(self: object):
+        self._generator = _Generator()
+
+    @property
+    def generator(self: object) -> _Generator:
+        return self._generator
+
+    def add_header(
+            self: object,
+            cmake_minimum_required_version: str,
+            project_name: str,
+            project_version_major: int,
+            project_version_minor: int,
+            project_version_patch: str,
+            c_language_standard: int,
+            c_language_standard_required: bool,
+            c_compiler_extensions_required: bool,
+            cpp_language_standard: int,
+            cpp_language_standard_required: bool,
+            cpp_compiler_extensions_required: bool
+    ) -> None:
+        part = _HeaderGeneratorPart(
+                    cmake_minimum_required_version,
+                    project_name,
+                    project_version_major,
+                    project_version_minor,
+                    project_version_patch,
+                    c_language_standard,
+                    c_language_standard_required,
+                    c_compiler_extensions_required,
+                    cpp_language_standard,
+                    cpp_language_standard_required,
+                    cpp_compiler_extensions_required
+                )
+        self._generator.add_part(part)
 
 
 def generate(
@@ -116,14 +184,37 @@ def generate(
         cpp_compiler_extensions_required: bool,
         cmake_compile_definitions: list
 ) -> None:
-    with open(_get_cmakelists_file(project_root_path), "w") as cmakelists_root_file:
-        _write_cmake_minimum_required_version(cmakelists_root_file, cmake_minimum_required_version)
-        _write_project_specifications(cmakelists_root_file, project_name,
-                                      project_version_major, project_version_minor, project_version_patch)
-        _write_language_specifications( cmakelists_root_file,
-                                        c_language_standard, c_language_standard_required, c_compiler_extensions_required,
-                                        cpp_language_standard, cpp_language_standard_required, cpp_compiler_extensions_required)
-        _write_destination_specifications(cmakelists_root_file)
+        builder = _GeneratorBuilder()
+
+        # Header is the same for all cases
+        builder.add_header(
+                    cmake_minimum_required_version,
+                    project_name,
+                    project_version_major,
+                    project_version_minor,
+                    project_version_patch,
+                    c_language_standard,
+                    c_language_standard_required,
+                    c_compiler_extensions_required,
+                    cpp_language_standard,
+                    cpp_language_standard_required,
+                    cpp_compiler_extensions_required
+                )
+
+        match project_build_type:
+            case "app":
+                pass
+            case "lib":
+                pass
+            case "dll":
+                pass
+            case "tmp":
+                pass
+            case _:
+                raise None
+
+        with open(os.path.join(project_root_path, "CMakeLists.txt"), "w") as cmakelists_root_file:
+            builder.generator.generate(cmakelists_root_file)
 
 
 def build(
@@ -133,7 +224,7 @@ def build(
         cpp_compiler_path: str=None,
         clear: bool=False
 ) -> None:
-    build_path = _get_build_path(project_root_path)
+    build_path = os.path.join(project_root_path, "build")
 
     if clear:
         if os.path.exists(build_path) and os.path.isdir(build_path):
