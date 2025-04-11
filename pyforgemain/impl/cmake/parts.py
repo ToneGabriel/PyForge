@@ -1,6 +1,11 @@
 from .generator import IGeneratorPart
 
 
+_PROJECT_EXECUTABLE_CMAKE_VAR_NAME = "PROJECT_EXECUTABLE_NAME"
+_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME = "PROJECT_STATIC_LIBRARY_NAME"
+_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME = "PROJECT_SHARED_LIBRARY_NAME"
+
+
 def _adapt_to_cmake_bool(value: bool) -> str:
     return "ON" if value else "OFF"
 
@@ -71,3 +76,43 @@ class HeaderGeneratorPart(IGeneratorPart):
         file.write( f"\n")
 
 
+class StaticLibraryGeneratorPart(IGeneratorPart):
+    def __init__(
+            self: object,
+            project_name: str,
+            include_directories: list[str],
+            source_files: list[str]
+    ):
+        self._project_name = project_name
+        self._include_directories = include_directories
+        self._source_files = source_files
+
+    def generate(self: object, file):
+        self._write_static_library_header(file)
+        self._write_target_include_directories(file)
+        self._write_target_sources(file)
+
+    def _write_static_library_header(self: object, file) -> None:
+        lib_name: str = self._project_name + "_static_lib"
+        file.write(f"set({_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME} \"{lib_name}\")\n"
+                   f"add_library(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} STATIC)\n"
+                   )
+        file.write(f"\n")
+
+    def _write_target_include_directories(self: object, file) -> None:
+        pass
+
+    def _write_target_sources(self: object, file) -> None:
+        file.write(f"target_sources(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC\n")
+        for source in self._source_files:
+            file.write(f"{source}\n")
+        file.write(f")\n")
+        file.write(f"\n")
+
+
+class SharedLibraryGeneratorPart(IGeneratorPart):
+    def __init__(self: object):
+        pass
+
+    def generate(self: object, file):
+        pass

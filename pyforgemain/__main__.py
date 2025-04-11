@@ -53,12 +53,14 @@ def _setup_project_structure_menu_map_help(forger: Forger) -> None:
 
 def _build_project_menu_map_help(forger: Forger) -> None:
     forger.generate_cmakelists()
-    forger.build_project()
+    # TODO: uncomment this
+    # forger.build_project()
 
 
 def _build_project_clean_menu_map_help(forger: Forger) -> None:
     forger.generate_cmakelists()
-    forger.build_project(clean=True)
+    # TODO: uncomment this
+    # forger.build_project(clean=True)
 
 
 _MENU_OPTIONS = {

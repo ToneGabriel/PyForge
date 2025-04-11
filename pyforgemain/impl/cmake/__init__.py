@@ -4,36 +4,22 @@ import subprocess
 
 from .generatorbuilder import GeneratorBuilder
 
-# __all__ = ["build_project", "generate_cmakelists"]
+
+def _get_include_dirs(include_path) -> list[str]:
+    pass
 
 
-# _PROJECT_EXECUTABLE_CMAKE_VAR_NAME = "PROJECT_EXECUTABLE_NAME"
-# _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME = "PROJECT_STATIC_LIBRARY_NAME"
-# _PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME = "PROJECT_SHARED_LIBRARY_NAME"
+def _get_sources(source_path) -> list[str]:
+    ret: list[str] = []
 
+    for dirpath, _, filenames in os.walk(source_path):
+        for filename in filenames:
+            if filename.endswith(('.c', '.cpp')):
+                relative_path = os.path.relpath(os.path.join(dirpath, filename),
+                                                start=os.path.dirname(source_path))
+                ret.append(relative_path.replace(os.path.sep, '/'))
 
-# # def _list_folder_contents(directory, indent=0):
-# #     try:
-# #         with os.scandir(directory) as entries:
-# #             for entry in entries:
-# #                 if entry.is_file():
-# #                     name, ext = os.path.splitext(entry.name)
-# #                     print("  " * indent + f"File: {name} (Extension: {ext})")
-# #                 elif entry.is_dir():
-# #                     print("  " * indent + f"Folder: {entry.name}")
-# #                     _list_folder_contents(entry.path, indent + 1)
-# #                 else:
-# #                     print("  " * indent + f"Unknown: {entry.name}")
-# #     except PermissionError:
-# #         print("  " * indent + "[Permission Denied]")
-
-
-# def _write_work_variables(file):
-#     file.write( f"set(LIBRARY_NAME \"ProjectLibrary\")\n"
-#                 f"set(EXECUTABLE_NAME \"ProjectExecutable\")\n"
-#                 f"set(CURRENT_DIRECTORY \"./\")\n"
-#                )
-#     file.write( f"\n")
+    return ret
 
 
 def generate(
@@ -52,6 +38,14 @@ def generate(
         cpp_compiler_extensions_required: bool,
         cmake_compile_definitions: list
 ) -> None:
+        cmakelists_path = os.path.join(project_root_path, "CMakeLists.txt")
+        include_path = os.path.join(project_root_path, "include")
+        source_path = os.path.join(project_root_path, "source")
+        app_path = os.path.join(project_root_path, "app")
+
+        include_directories = _get_include_dirs(include_path)
+        source_files = _get_sources(source_path)
+
         builder = GeneratorBuilder()
 
         # Header is the same for all cases
@@ -71,18 +65,26 @@ def generate(
 
         match project_build_type:
             case "app":
-                pass
+                builder.add_static_library(
+                            project_name,
+                            include_directories,
+                            source_files
+                        )
+                # builder.add_executable()
             case "lib":
                 pass
+                # builder.add_static_library()
             case "dll":
                 pass
+                # builder.add_static_library()
+                # builder.add_shared_library()
             case "tmp":
                 pass
             case _:
                 raise None
 
-        with open(os.path.join(project_root_path, "CMakeLists.txt"), "w") as cmakelists_root_file:
-            builder.generator.generate(cmakelists_root_file)
+        with open(cmakelists_path, "w") as cmakelists_root_open_file:
+            builder.generator.generate(cmakelists_root_open_file)
 
 
 def build(
