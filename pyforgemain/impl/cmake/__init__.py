@@ -23,13 +23,10 @@ def _get_sources(source_path) -> list[str]:
 
 
 def generate(
-        cmake_minimum_required_version: str,
         project_root_path: str,
         project_name: str,
         project_build_type: str,
-        project_version_major: int,
-        project_version_minor: int,
-        project_version_patch: str,
+        project_version: str,
         c_language_standard: int,
         c_language_standard_required: bool,
         c_compiler_extensions_required: bool,
@@ -50,11 +47,8 @@ def generate(
 
         # Header is the same for all cases
         builder.add_header(
-                    cmake_minimum_required_version,
                     project_name,
-                    project_version_major,
-                    project_version_minor,
-                    project_version_patch,
+                    project_version,
                     c_language_standard,
                     c_language_standard_required,
                     c_compiler_extensions_required,
@@ -92,11 +86,11 @@ def build(
         cmake_generator: str,
         c_compiler_path: str=None,
         cpp_compiler_path: str=None,
-        clear: bool=False
+        clean: bool=False
 ) -> None:
     build_path = os.path.join(project_root_path, "build")
 
-    if clear:
+    if clean:
         if os.path.exists(build_path) and os.path.isdir(build_path):
             shutil.rmtree(build_path)
 

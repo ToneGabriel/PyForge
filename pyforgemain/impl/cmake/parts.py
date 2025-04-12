@@ -1,6 +1,7 @@
 from .generator import IGeneratorPart
 
 
+_CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
 _PROJECT_EXECUTABLE_CMAKE_VAR_NAME = "PROJECT_EXECUTABLE_NAME"
 _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME = "PROJECT_STATIC_LIBRARY_NAME"
 _PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME = "PROJECT_SHARED_LIBRARY_NAME"
@@ -13,11 +14,8 @@ def _adapt_to_cmake_bool(value: bool) -> str:
 class HeaderGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
-            cmake_minimum_required_version: str,
             project_name: str,
-            project_version_major: int,
-            project_version_minor: int,
-            project_version_patch: str,
+            project_version: str,
             c_language_standard: int,
             c_language_standard_required: bool,
             c_compiler_extensions_required: bool,
@@ -25,11 +23,8 @@ class HeaderGeneratorPart(IGeneratorPart):
             cpp_language_standard_required: bool,
             cpp_compiler_extensions_required: bool
     ):
-        self._cmake_minimum_required_version = cmake_minimum_required_version
         self._project_name = project_name
-        self._project_version_major = project_version_major
-        self._project_version_minor = project_version_minor
-        self._project_version_patch = project_version_patch
+        self._project_version = project_version
         self._c_language_standard = c_language_standard
         self._c_language_standard_required = c_language_standard_required
         self._c_compiler_extensions_required = c_compiler_extensions_required
@@ -44,15 +39,12 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._write_destination_specifications(file)
 
     def _write_cmake_minimum_required_version(self: object, file) -> None:
-        file.write( f"cmake_minimum_required(VERSION "
-                    f"{self._cmake_minimum_required_version} "
-                    f"FATAL_ERROR)\n"
-                    )
+        file.write( f"cmake_minimum_required(VERSION {_CMAKE_MINIMUM_REQUIRED_VERSION} FATAL_ERROR)\n")
         file.write( f"\n")
 
     def _write_project_specifications(self: object, file) -> None:
         file.write( f"project({self._project_name} "
-                    f"VERSION {self._project_version_major}.{self._project_version_minor}.{self._project_version_patch} "
+                    f"VERSION {self._project_version} "
                     f"LANGUAGES C CXX)\n"
                     )
         file.write( f"\n")

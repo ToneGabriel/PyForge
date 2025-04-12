@@ -44,14 +44,8 @@ _EXPECTED_BUILD_JSON_STRUCTURE = {
 class _ProjectSetupData:
     '''This class contains the parsed data from setup JSON as properties'''
 
-    _CMAKE_MINIMUM_REQUIRED_VERSION: str = "3.22.1"
-
     def __init__(self: object, json_path: str):
         self._data = jsonvalid.load(json_path, _EXPECTED_BUILD_JSON_STRUCTURE)
-
-    @property
-    def cmake_minimum_required_version(self: object) -> str:
-        return _ProjectSetupData._CMAKE_MINIMUM_REQUIRED_VERSION
 
     @property
     def project_root_path(self: object) -> str:
@@ -66,16 +60,11 @@ class _ProjectSetupData:
         return self._data["project_settings"]["build"]
 
     @property
-    def project_version_major(self: object) -> int:
-        return self._data["project_settings"]["version"]["major"]
-    
-    @property
-    def project_version_minor(self: object) -> int:
-        return self._data["project_settings"]["version"]["minor"]
-    
-    @property
-    def project_version_patch(self: object) -> int:
-        return self._data["project_settings"]["version"]["patch"]
+    def project_version(self: object) -> str:
+        return (f"{self._data["project_settings"]["version"]["major"]}."
+                f"{self._data["project_settings"]["version"]["minor"]}."
+                f"{self._data["project_settings"]["version"]["patch"]}"
+                )
 
     @property
     def c_compiler_path(self: object) -> str:
@@ -119,30 +108,28 @@ class _ProjectSetupData:
 
 
 class Forger:
-    def __init__(self: object, json_path: str, zip_structure_path: str):
-        self._project_setup_data = _ProjectSetupData(json_path)
+    def __init__(self: object, project_setup_data: _ProjectSetupData, zip_structure_path: str):
+        self._project_setup_data = project_setup_data
         self._zip_structure_path = zip_structure_path
 
     def setup_project_structure(self: object) -> None:
-        structure.setup_project(self._zip_structure_path, self._project_setup_data.project_root_path)
+        structure.setup_project(self._zip_structure_path,
+                                self._project_setup_data.project_root_path
+                                )
 
     def generate_cmakelists(self: object) -> None:
-        cmake.generate(
-            cmake_minimum_required_version=self._project_setup_data.cmake_minimum_required_version,
-            project_root_path=self._project_setup_data.project_root_path,
-            project_name=self._project_setup_data.project_name,
-            project_build_type=self._project_setup_data.project_build_type,
-            project_version_major=self._project_setup_data.project_version_major,
-            project_version_minor=self._project_setup_data.project_version_minor,
-            project_version_patch=self._project_setup_data.project_version_patch,
-            c_language_standard=self._project_setup_data.c_language_standard,
-            c_language_standard_required=self._project_setup_data.c_language_standard_required,
-            c_compiler_extensions_required=self._project_setup_data.c_compiler_extensions_required,
-            cpp_language_standard=self._project_setup_data.cpp_language_standard,
-            cpp_language_standard_required=self._project_setup_data.cpp_language_standard_required,
-            cpp_compiler_extensions_required=self._project_setup_data.cpp_compiler_extensions_required,
-            cmake_compile_definitions=self._project_setup_data.cmake_compile_definitions,
-        )
+        cmake.generate( project_root_path=self._project_setup_data.project_root_path,
+                        project_name=self._project_setup_data.project_name,
+                        project_build_type=self._project_setup_data.project_build_type,
+                        project_version=self._project_setup_data.project_version,
+                        c_language_standard=self._project_setup_data.c_language_standard,
+                        c_language_standard_required=self._project_setup_data.c_language_standard_required,
+                        c_compiler_extensions_required=self._project_setup_data.c_compiler_extensions_required,
+                        cpp_language_standard=self._project_setup_data.cpp_language_standard,
+                        cpp_language_standard_required=self._project_setup_data.cpp_language_standard_required,
+                        cpp_compiler_extensions_required=self._project_setup_data.cpp_compiler_extensions_required,
+                        cmake_compile_definitions=self._project_setup_data.cmake_compile_definitions,
+                        )
 
     def build_project(self: object, clean: bool=False) -> None:
         cmake.build(self._project_setup_data.project_root_path,
@@ -151,3 +138,8 @@ class Forger:
                     self._project_setup_data.cpp_compiler_path,
                     clean
                     )
+
+
+def make_forger(json_path: str, zip_structure_path: str) -> Forger:
+    project_setup_data = _ProjectSetupData(json_path)
+    return Forger(project_setup_data, zip_structure_path)

@@ -5,7 +5,7 @@ from rich.prompt import Prompt
 
 import textwrap
 
-from impl import Forger
+from impl import Forger, make_forger
 
 
 def _get_parser() -> ArgumentParser:
@@ -101,7 +101,7 @@ def _build_menu_text_and_keys() -> tuple[str, list[str]]:
     return (f"{header}\n{body}", keys)
 
 
-def main(args) -> None:
+def main(json_path, zip_structure_path) -> None:
     MAIN_CONSOLE = Console()
     (menu_text, option_keys) = _build_menu_text_and_keys()
 
@@ -117,7 +117,7 @@ def main(args) -> None:
 
         # try action
         try:
-            forger = Forger(args.json, args.structure)
+            forger = make_forger(json_path, zip_structure_path)
 
             MAIN_CONSOLE.print(f"Executing: {option.label}...", style="yellow")
             option.action(forger)
@@ -132,4 +132,5 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-    main(_get_parser().parse_args())
+    args = _get_parser().parse_args()
+    main(args.json, args.structure)

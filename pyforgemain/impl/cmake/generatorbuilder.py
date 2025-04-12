@@ -13,11 +13,8 @@ class GeneratorBuilder:
 
     def add_header(
             self: object,
-            cmake_minimum_required_version: str,
             project_name: str,
-            project_version_major: int,
-            project_version_minor: int,
-            project_version_patch: str,
+            project_version: str,
             c_language_standard: int,
             c_language_standard_required: bool,
             c_compiler_extensions_required: bool,
@@ -26,11 +23,8 @@ class GeneratorBuilder:
             cpp_compiler_extensions_required: bool
     ) -> None:
         part = HeaderGeneratorPart(
-                    cmake_minimum_required_version,
                     project_name,
-                    project_version_major,
-                    project_version_minor,
-                    project_version_patch,
+                    project_version,
                     c_language_standard,
                     c_language_standard_required,
                     c_compiler_extensions_required,
