@@ -1,15 +1,19 @@
 from .generator import Generator
-from .parts import  HeaderGeneratorPart,\
-                    StaticLibraryGeneratorPart, \
-                    SharedLibraryGeneratorPart
+from .generatorparts import HeaderGeneratorPart,\
+                            StaticLibraryGeneratorPart, \
+                            SharedLibraryGeneratorPart
+
 
 class GeneratorBuilder:
     def __init__(self: object):
-        self._generator = Generator()
+        self.reset()
 
     @property
     def generator(self: object) -> Generator:
         return self._generator
+
+    def reset(self: object) -> None:
+        self._generator = Generator()
 
     def add_header(
             self: object,

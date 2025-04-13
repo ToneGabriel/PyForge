@@ -11,6 +11,10 @@ def _adapt_to_cmake_bool(value: bool) -> str:
     return "ON" if value else "OFF"
 
 
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
 class HeaderGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
@@ -39,15 +43,13 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._write_destination_specifications(file)
 
     def _write_cmake_minimum_required_version(self: object, file) -> None:
-        file.write( f"cmake_minimum_required(VERSION {_CMAKE_MINIMUM_REQUIRED_VERSION} FATAL_ERROR)\n")
-        file.write( f"\n")
+        file.write( f"cmake_minimum_required(VERSION {_CMAKE_MINIMUM_REQUIRED_VERSION} FATAL_ERROR)\n\n")
 
     def _write_project_specifications(self: object, file) -> None:
         file.write( f"project({self._project_name} "
                     f"VERSION {self._project_version} "
-                    f"LANGUAGES C CXX)\n"
+                    f"LANGUAGES C CXX)\n\n"
                     )
-        file.write( f"\n")
 
     def _write_language_specifications(self: object, file) -> None:
         file.write( f"set(CMAKE_C_STANDARD {self._c_language_standard})\n"
@@ -56,16 +58,18 @@ class HeaderGeneratorPart(IGeneratorPart):
 
                     f"set(CMAKE_cpp_standard {self._cpp_language_standard})\n"
                     f"set(CMAKE_cpp_standard_REQUIRED {_adapt_to_cmake_bool(self._cpp_language_standard_required)})\n"
-                    f"set(CMAKE_cpp_extensions {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n"
+                    f"set(CMAKE_cpp_extensions {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n\n"
                     )
-        file.write( f"\n")
 
     def _write_destination_specifications(self: object, file) -> None:
         file.write( f"set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/bin)\n"
                     f"set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib)\n"
-                    f"set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib)\n"
+                    f"set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib)\n\n"
                     )
-        file.write( f"\n")
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
 
 
 class StaticLibraryGeneratorPart(IGeneratorPart):
@@ -86,10 +90,9 @@ class StaticLibraryGeneratorPart(IGeneratorPart):
 
     def _write_static_library_header(self: object, file) -> None:
         lib_name: str = self._project_name + "_static_lib"
-        file.write(f"set({_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME} \"{lib_name}\")\n"
-                   f"add_library(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} STATIC)\n"
-                   )
-        file.write(f"\n")
+        file.write( f"set({_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME} \"{lib_name}\")\n"
+                    f"add_library(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} STATIC)\n\n"
+                    )
 
     def _write_target_include_directories(self: object, file) -> None:
         pass
@@ -98,8 +101,11 @@ class StaticLibraryGeneratorPart(IGeneratorPart):
         file.write(f"target_sources(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC\n")
         for source in self._source_files:
             file.write(f"{source}\n")
-        file.write(f")\n")
-        file.write(f"\n")
+        file.write(f")\n\n")
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
 
 
 class SharedLibraryGeneratorPart(IGeneratorPart):
