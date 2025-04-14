@@ -41,11 +41,33 @@ _EXPECTED_BUILD_JSON_STRUCTURE = {
 }   # END _EXPECTED_BUILD_JSON_STRUCTURE
 
 
-class _ProjectSetupData:
-    '''This class contains the parsed data from setup JSON as properties'''
+class _SingletonMeta(type):
+    _instances = {}
 
-    def __init__(self: object, json_path: str):
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+
+        return cls._instances[cls]
+
+
+class _Database(metaclass=_SingletonMeta):
+    def __init__(self: object):
+        self._data = None
+
+    def is_initialized(self: object) -> bool:
+        return self._data is not None
+
+    def initialize(self: object, json_path: str, zip_structure_path: str) -> None:
+        if self.is_initialized():
+            return
+
         self._data = jsonvalid.load(json_path, _EXPECTED_BUILD_JSON_STRUCTURE)
+        self._data["zip_structure_path"] = zip_structure_path
+
+    @property
+    def zip_structure_path(self: object) -> str:
+        return self._data["zip_structure_path"]
 
     @property
     def project_root_path(self: object) -> str:
@@ -107,39 +129,45 @@ class _ProjectSetupData:
         return self._data["cmake_settings"]["compile_definitions"]
 
 
-class Forger:
-    def __init__(self: object, project_setup_data: _ProjectSetupData, zip_structure_path: str):
-        self._project_setup_data = project_setup_data
-        self._zip_structure_path = zip_structure_path
+def _get_database() -> _Database:
+    db = _Database()
 
-    def setup_project_structure(self: object) -> None:
-        structure.setup_project(self._zip_structure_path,
-                                self._project_setup_data.project_root_path
-                                )
+    if not db.is_initialized():
+        raise RuntimeError("Database has not been initialized. Call initialize() first.")
 
-    def generate_cmakelists(self: object) -> None:
-        cmake.generate( project_root_path=self._project_setup_data.project_root_path,
-                        project_name=self._project_setup_data.project_name,
-                        project_build_type=self._project_setup_data.project_build_type,
-                        project_version=self._project_setup_data.project_version,
-                        c_language_standard=self._project_setup_data.c_language_standard,
-                        c_language_standard_required=self._project_setup_data.c_language_standard_required,
-                        c_compiler_extensions_required=self._project_setup_data.c_compiler_extensions_required,
-                        cpp_language_standard=self._project_setup_data.cpp_language_standard,
-                        cpp_language_standard_required=self._project_setup_data.cpp_language_standard_required,
-                        cpp_compiler_extensions_required=self._project_setup_data.cpp_compiler_extensions_required,
-                        cmake_compile_definitions=self._project_setup_data.cmake_compile_definitions,
-                        )
-
-    def build_project(self: object, clean: bool=False) -> None:
-        cmake.build(self._project_setup_data.project_root_path,
-                    self._project_setup_data.cmake_generator,
-                    self._project_setup_data.c_compiler_path,
-                    self._project_setup_data.cpp_compiler_path,
-                    clean
-                    )
+    return db
 
 
-def make_forger(json_path: str, zip_structure_path: str) -> Forger:
-    project_setup_data = _ProjectSetupData(json_path)
-    return Forger(project_setup_data, zip_structure_path)
+def initialize(json_path: str, zip_structure_path: str) -> None:
+    db = _Database()
+    db.initialize(json_path, zip_structure_path)
+
+
+def setup_project_structure() -> None:
+    db = _get_database()
+    structure.setup_project(zip_structure_path=db.zip_structure_path,
+                            project_root_path=db.project_root_path)
+
+
+def generate_cmakelists() -> None:
+    db = _get_database()
+    cmake.generate( project_root_path=db.project_root_path,
+                    project_name=db.project_name,
+                    project_build_type=db.project_build_type,
+                    project_version=db.project_version,
+                    c_language_standard=db.c_language_standard,
+                    c_language_standard_required=db.c_language_standard_required,
+                    c_compiler_extensions_required=db.c_compiler_extensions_required,
+                    cpp_language_standard=db.cpp_language_standard,
+                    cpp_language_standard_required=db.cpp_language_standard_required,
+                    cpp_compiler_extensions_required=db.cpp_compiler_extensions_required,
+                    cmake_compile_definitions=db.cmake_compile_definitions)
+
+
+def build_project(clean: bool=False) -> None:
+    db = _get_database()
+    cmake.build(project_root_path=db.project_root_path,
+                cmake_generator=db.cmake_generator,
+                c_compiler_path=db.c_compiler_path,
+                cpp_compiler_path=db.cpp_compiler_path,
+                clean=clean)

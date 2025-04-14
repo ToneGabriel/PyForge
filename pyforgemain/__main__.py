@@ -5,7 +5,7 @@ from rich.prompt import Prompt
 
 import textwrap
 
-from impl import Forger, make_forger
+import impl
 
 
 def _get_parser() -> ArgumentParser:
@@ -47,20 +47,18 @@ class MenuOption:
         return self._action
 
 
-def _setup_project_structure_menu_map_help(forger: Forger) -> None:
-    forger.setup_project_structure()
+def _setup_project_structure_menu_map_help() -> None:
+    impl.setup_project_structure()
 
 
-def _build_project_menu_map_help(forger: Forger) -> None:
-    forger.generate_cmakelists()
-    # TODO: uncomment this
-    # forger.build_project()
+def _build_project_menu_map_help() -> None:
+    impl.generate_cmakelists()
+    impl.build_project()
 
 
-def _build_project_clean_menu_map_help(forger: Forger) -> None:
-    forger.generate_cmakelists()
-    # TODO: uncomment this
-    # forger.build_project(clean=True)
+def _build_project_clean_menu_map_help() -> None:
+    impl.generate_cmakelists()
+    impl.build_project(clean=True)
 
 
 _MENU_OPTIONS = {
@@ -117,10 +115,10 @@ def main(json_path, zip_structure_path) -> None:
 
         # try action
         try:
-            forger = make_forger(json_path, zip_structure_path)
+            impl.initialize(json_path, zip_structure_path)
 
             MAIN_CONSOLE.print(f"Executing: {option.label}...", style="yellow")
-            option.action(forger)
+            option.action()
         except Exception as e:
             MAIN_CONSOLE.print(f"Operation failed: {e}", style="red")
         else:
