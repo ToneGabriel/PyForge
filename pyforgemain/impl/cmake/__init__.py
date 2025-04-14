@@ -43,10 +43,7 @@ def generate(
         include_directories = _get_include_dirs(include_path)
         source_files = _get_sources(source_path)
 
-        builder = GeneratorBuilder()
-
-        # Header is the same for all cases
-        builder.add_header(
+        builder = GeneratorBuilder(
                     project_name,
                     project_version,
                     c_language_standard,
@@ -54,31 +51,31 @@ def generate(
                     c_compiler_extensions_required,
                     cpp_language_standard,
                     cpp_language_standard_required,
-                    cpp_compiler_extensions_required
+                    cpp_compiler_extensions_required,
+                    cmake_compile_definitions,
+                    include_directories,
+                    source_files
                 )
+
+        # Header is the same for all cases
+        builder.add_header()
 
         match project_build_type:
             case "app":
-                builder.add_static_library(
-                            project_name,
-                            include_directories,
-                            source_files
-                        )
-                # builder.add_executable()
+                builder.add_static_library()
+                builder.add_executable()
             case "lib":
-                pass
-                # builder.add_static_library()
+                builder.add_static_library()
             case "dll":
-                pass
-                # builder.add_static_library()
-                # builder.add_shared_library()
+                builder.add_static_library()
+                builder.add_shared_library()
             case "tmp":
                 pass
             case _:
                 raise None
 
         with open(cmakelists_path, "w") as cmakelists_root_open_file:
-            builder.generator.generate(cmakelists_root_open_file)
+            builder.generator.run(cmakelists_root_open_file)
 
 
 def build(

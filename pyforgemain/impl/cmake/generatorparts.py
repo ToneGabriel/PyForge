@@ -2,6 +2,7 @@ from .generator import IGeneratorPart
 
 
 _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
+_TEST_EXECUTABLE_CMAKE_VAR_NAME = "TEST_EXECUTABLE_NAME"
 _PROJECT_EXECUTABLE_CMAKE_VAR_NAME = "PROJECT_EXECUTABLE_NAME"
 _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME = "PROJECT_STATIC_LIBRARY_NAME"
 _PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME = "PROJECT_SHARED_LIBRARY_NAME"
@@ -36,7 +37,7 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._cpp_language_standard_required = cpp_language_standard_required
         self._cpp_compiler_extensions_required = cpp_compiler_extensions_required
 
-    def generate(self: object, file):
+    def run(self: object, file):
         self._write_cmake_minimum_required_version(file)
         self._write_project_specifications(file)
         self._write_language_specifications(file)
@@ -56,9 +57,9 @@ class HeaderGeneratorPart(IGeneratorPart):
                     f"set(CMAKE_C_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._c_language_standard_required)})\n"
                     f"set(CMAKE_C_EXTENSIONS {_adapt_to_cmake_bool(self._c_compiler_extensions_required)})\n\n"
 
-                    f"set(CMAKE_cpp_standard {self._cpp_language_standard})\n"
-                    f"set(CMAKE_cpp_standard_REQUIRED {_adapt_to_cmake_bool(self._cpp_language_standard_required)})\n"
-                    f"set(CMAKE_cpp_extensions {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n\n"
+                    f"set(CMAKE_CXX_STANDARD {self._cpp_language_standard})\n"
+                    f"set(CMAKE_CXX_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._cpp_language_standard_required)})\n"
+                    f"set(CMAKE_CXX_EXTENSIONS {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n\n"
                     )
 
     def _write_destination_specifications(self: object, file) -> None:
@@ -83,7 +84,7 @@ class StaticLibraryGeneratorPart(IGeneratorPart):
         self._include_directories = include_directories
         self._source_files = source_files
 
-    def generate(self: object, file):
+    def run(self: object, file):
         self._write_static_library_header(file)
         self._write_target_include_directories(file)
         self._write_target_sources(file)
@@ -112,5 +113,5 @@ class SharedLibraryGeneratorPart(IGeneratorPart):
     def __init__(self: object):
         pass
 
-    def generate(self: object, file):
+    def run(self: object, file):
         pass
