@@ -51,7 +51,7 @@ class _SingletonMeta(type):
         return cls._instances[cls]
 
 
-class _Database(metaclass=_SingletonMeta):
+class _Dataset(metaclass=_SingletonMeta):
     def __init__(self: object):
         self._data = None
 
@@ -129,45 +129,45 @@ class _Database(metaclass=_SingletonMeta):
         return self._data["cmake_settings"]["compile_definitions"]
 
 
-def _get_database() -> _Database:
-    db = _Database()
+def _get_dataset() -> _Dataset:
+    data = _Dataset()
 
-    if not db.is_initialized():
-        raise RuntimeError("Database has not been initialized. Call initialize() first.")
+    if not data.is_initialized():
+        raise RuntimeError("Dataset has not been initialized. Call initialize() first.")
 
-    return db
+    return data
 
 
 def initialize(json_path: str, zip_structure_path: str) -> None:
-    db = _Database()
-    db.initialize(json_path, zip_structure_path)
+    data = _Dataset()
+    data.initialize(json_path, zip_structure_path)
 
 
 def setup_project_structure() -> None:
-    db = _get_database()
-    structure.setup_project(zip_structure_path=db.zip_structure_path,
-                            project_root_path=db.project_root_path)
+    data = _get_dataset()
+    structure.setup_project(zip_structure_path=data.zip_structure_path,
+                            project_root_path=data.project_root_path)
 
 
 def generate_cmakelists() -> None:
-    db = _get_database()
-    cmake.generate( project_root_path=db.project_root_path,
-                    project_name=db.project_name,
-                    project_build_type=db.project_build_type,
-                    project_version=db.project_version,
-                    c_language_standard=db.c_language_standard,
-                    c_language_standard_required=db.c_language_standard_required,
-                    c_compiler_extensions_required=db.c_compiler_extensions_required,
-                    cpp_language_standard=db.cpp_language_standard,
-                    cpp_language_standard_required=db.cpp_language_standard_required,
-                    cpp_compiler_extensions_required=db.cpp_compiler_extensions_required,
-                    cmake_compile_definitions=db.cmake_compile_definitions)
+    data = _get_dataset()
+    cmake.generate( project_root_path=data.project_root_path,
+                    project_name=data.project_name,
+                    project_build_type=data.project_build_type,
+                    project_version=data.project_version,
+                    c_language_standard=data.c_language_standard,
+                    c_language_standard_required=data.c_language_standard_required,
+                    c_compiler_extensions_required=data.c_compiler_extensions_required,
+                    cpp_language_standard=data.cpp_language_standard,
+                    cpp_language_standard_required=data.cpp_language_standard_required,
+                    cpp_compiler_extensions_required=data.cpp_compiler_extensions_required,
+                    cmake_compile_definitions=data.cmake_compile_definitions)
 
 
 def build_project(clean: bool=False) -> None:
-    db = _get_database()
-    cmake.build(project_root_path=db.project_root_path,
-                cmake_generator=db.cmake_generator,
-                c_compiler_path=db.c_compiler_path,
-                cpp_compiler_path=db.cpp_compiler_path,
+    data = _get_dataset()
+    cmake.build(project_root_path=data.project_root_path,
+                cmake_generator=data.cmake_generator,
+                c_compiler_path=data.c_compiler_path,
+                cpp_compiler_path=data.cpp_compiler_path,
                 clean=clean)
