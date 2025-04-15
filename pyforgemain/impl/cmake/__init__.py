@@ -5,11 +5,17 @@ import subprocess
 from .generatorbuilder import GeneratorBuilder
 
 
-def _get_include_dirs(include_path) -> list[str]:
-    pass
+def _get_include_dirs(include_path: str) -> list[str]:
+    ret: list[str] = []
+
+    for dirpath, _, _ in os.walk(include_path):
+        relative_path = os.path.relpath(dirpath, start=os.path.dirname(include_path))
+        ret.append(relative_path.replace(os.path.sep, '/'))
+
+    return ret
 
 
-def _get_sources(source_path) -> list[str]:
+def _get_sources(source_path: str) -> list[str]:
     ret: list[str] = []
 
     for dirpath, _, filenames in os.walk(source_path):
@@ -20,6 +26,10 @@ def _get_sources(source_path) -> list[str]:
                 ret.append(relative_path.replace(os.path.sep, '/'))
 
     return ret
+
+
+def _get_executable(app_path: str) -> str:
+    pass
 
 
 def generate(
@@ -42,6 +52,7 @@ def generate(
 
         include_directories = _get_include_dirs(include_path)
         source_files = _get_sources(source_path)
+        executable_file = _get_executable(app_path)
 
         builder = GeneratorBuilder(
                     project_name,
@@ -54,7 +65,8 @@ def generate(
                     cpp_compiler_extensions_required,
                     cmake_compile_definitions,
                     include_directories,
-                    source_files
+                    source_files,
+                    executable_file
                 )
 
         # Header is the same for all cases

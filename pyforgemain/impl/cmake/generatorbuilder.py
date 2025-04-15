@@ -1,7 +1,8 @@
 from .generator import Generator
 from .generatorparts import HeaderGeneratorPart,\
                             StaticLibraryGeneratorPart,\
-                            SharedLibraryGeneratorPart
+                            SharedLibraryGeneratorPart,\
+                            ExecutableGeneratorPart
 
 
 class GeneratorBuilder:
@@ -17,7 +18,8 @@ class GeneratorBuilder:
             cpp_compiler_extensions_required: bool,
             cmake_compile_definitions: list,
             include_directories: list,
-            source_files: list
+            source_files: list,
+            executable_file: str
     ):
         self._project_name = project_name
         self._project_version = project_version
@@ -30,6 +32,7 @@ class GeneratorBuilder:
         self._cmake_compile_definitions = cmake_compile_definitions
         self._include_directories = include_directories
         self._source_files = source_files
+        self._executable_file = executable_file
         self.reset_generator()
 
     @property
@@ -69,9 +72,11 @@ class GeneratorBuilder:
                                 )
 
     def add_executable(self: object) -> None:
-        pass
-        part = None
-        self._generator.add_part(part)
+        self._generator.add_part(ExecutableGeneratorPart(
+                                    self._project_name,
+                                    self._executable_file
+                                    )
+                                )
 
     def add_compile_definitions(self: object) -> None:
         pass

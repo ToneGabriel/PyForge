@@ -37,7 +37,7 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._cpp_language_standard_required = cpp_language_standard_required
         self._cpp_compiler_extensions_required = cpp_compiler_extensions_required
 
-    def run(self: object, file):
+    def run(self: object, file) -> None:
         self._write_cmake_minimum_required_version(file)
         self._write_project_specifications(file)
         self._write_language_specifications(file)
@@ -84,7 +84,7 @@ class StaticLibraryGeneratorPart(IGeneratorPart):
         self._include_directories = include_directories
         self._source_files = source_files
 
-    def run(self: object, file):
+    def run(self: object, file) -> None:
         self._write_static_library_header(file)
         self._write_target_include_directories(file)
         self._write_target_sources(file)
@@ -96,12 +96,14 @@ class StaticLibraryGeneratorPart(IGeneratorPart):
                     )
 
     def _write_target_include_directories(self: object, file) -> None:
-        pass
+        for dir in self._include_directories:
+            file.write(f"target_include_directories(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC ${{CMAKE_SOURCE_DIR}}/{dir})\n")
+        file.write(f"\n")
 
     def _write_target_sources(self: object, file) -> None:
         file.write(f"target_sources(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC\n")
         for source in self._source_files:
-            file.write(f"{source}\n")
+            file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
         file.write(f")\n\n")
 
 
@@ -110,8 +112,56 @@ class StaticLibraryGeneratorPart(IGeneratorPart):
 
 
 class SharedLibraryGeneratorPart(IGeneratorPart):
-    def __init__(self: object):
-        pass
+    def __init__(
+            self: object,
+            project_name: str,
+            include_directories: list[str],
+            source_files: list[str]
+    ):
+        self._project_name = project_name
+        self._include_directories = include_directories
+        self._source_files = source_files
 
-    def run(self: object, file):
-        pass
+    def run(self: object, file) -> None:
+        self._write_shared_library_header(file)
+        self._write_target_include_directories(file)
+        self._write_target_sources(file)
+
+    def _write_shared_library_header(self: object, file) -> None:
+        lib_name: str = self._project_name + "_shared_lib"
+        file.write( f"set({_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME} \"{lib_name}\")\n"
+                    f"add_library(${{{_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME}}} SHARED)\n\n"
+                    )
+
+    def _write_target_include_directories(self: object, file) -> None:
+        for dir in self._include_directories:
+            file.write(f"target_include_directories(${{{_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC ${{CMAKE_SOURCE_DIR}}/{dir})\n")
+        file.write(f"\n")
+
+    def _write_target_sources(self: object, file) -> None:
+        file.write(f"target_sources(${{{_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC\n")
+        for source in self._source_files:
+            file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
+        file.write(f")\n\n")
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
+class ExecutableGeneratorPart(IGeneratorPart):
+    def __init__(
+            self: object,
+            project_name: str,
+            executable_file: str
+    ):
+        self._project_name = project_name
+        self._executable_file = executable_file
+
+    def run(self: object, file) -> None:
+        self._write_executable_header(file)
+
+    def _write_executable_header(self: object, file) -> None:
+        file.write( f"set({_PROJECT_EXECUTABLE_CMAKE_VAR_NAME} \"{self._project_name}\")\n"
+                    f"add_executable(${{{_PROJECT_EXECUTABLE_CMAKE_VAR_NAME}}} ${{CMAKE_SOURCE_DIR}}/{self._executable_file})\n\n"
+                    )

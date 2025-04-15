@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from menu import OptionsMenu
+import menu
 import impl
 
 
@@ -25,16 +25,16 @@ def _get_parser() -> ArgumentParser:
 
 
 def main(json_path, zip_structure_path) -> None:
-    menu = OptionsMenu()
+    main_menu = menu.OptionsMenu()
 
-    menu.set_header_text("PyForge")
-    menu.add_option("Initialize", impl.initialize, json_path, zip_structure_path)
-    menu.add_option("Setup Project Structure", impl.setup_project_structure)
-    menu.add_option("Generate CMakeLists", impl.generate_cmakelists)
-    menu.add_option("Build Project", impl.build_project)
-    menu.add_option("Build Project Clean", impl.build_project, True)
-    menu.add_option("Exit", None)
-    menu.run()
+    main_menu.set_header_text("PyForge")
+    main_menu.add_option("Initialize", impl.initialize, json_path, zip_structure_path)
+    main_menu.add_option("Setup Project Structure", impl.setup_project_structure)
+    main_menu.add_option("Generate CMakeLists", impl.generate_cmakelists)
+    main_menu.add_option("Build Project", impl.build_project)
+    main_menu.add_option("Build Project Clean", impl.build_project, True)
+    main_menu.add_option("Exit", None)
+    main_menu.run()
 
 
 if __name__ == "__main__":

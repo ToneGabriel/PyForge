@@ -59,9 +59,7 @@ class _Dataset(metaclass=_SingletonMeta):
         return self._data is not None
 
     def initialize(self: object, json_path: str, zip_structure_path: str) -> None:
-        if self.is_initialized():
-            return
-
+        # override prev config if any
         self._data = jsonvalid.load(json_path, _EXPECTED_BUILD_JSON_STRUCTURE)
         self._data["zip_structure_path"] = zip_structure_path
 
