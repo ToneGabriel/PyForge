@@ -64,11 +64,20 @@ class HeaderGeneratorPart(IGeneratorPart):
 # ==========================================================================================================================
 
 
-class TestHeaderGeneratorPart(IGeneratorPart):
-    def __init__(self: object):
-        pass
+class GoogleTestLibraryGeneratorPart(IGeneratorPart):
+    def __init__(
+            self: object,
+            gtest_cmake_var_name: str,
+            gmock_cmake_var_name: str,
+    ):
+        self._gtest_cmake_var_name = gtest_cmake_var_name
+        self._gmock_cmake_var_name = gmock_cmake_var_name
 
     def run(self: object, file) -> None:
+        self._write_gtest_header(file)
+        self._write_gtest_gmock_cmake_variables(file)
+
+    def _write_gtest_header(self: object, file) -> None:
         file.write( f"include(FetchContent)\n")
         file.write( f"FetchContent_Declare(\n"
                     f"googletest\n"
@@ -77,8 +86,14 @@ class TestHeaderGeneratorPart(IGeneratorPart):
                     )
         file.write(f")\n\n")
 
-        file.write( f"set(INSTALL_GTEST OFF CACHE BOOL \"Disable installation of googletest\" FORCE)\n\n")
-        file.write( f"FetchContent_MakeAvailable(googletest)\n\n")
+        file.write( f"set(INSTALL_GTEST OFF CACHE BOOL \"Disable installation of googletest\" FORCE)\n\n"
+                    f"FetchContent_MakeAvailable(googletest)\n\n"
+                    )
+
+    def _write_gtest_gmock_cmake_variables(self: object, file) -> None:
+        file.write( f"set({self._gtest_cmake_var_name} gtest)\n"
+                    f"set({self._gtest_cmake_var_name} gmock)\n\n"
+                    )
 
 
 # ==========================================================================================================================
@@ -151,3 +166,26 @@ class ExecutableGeneratorPart(IGeneratorPart):
         file.write( f"set({self._cmake_var_name} \"{exe_name}\")\n"
                     f"add_executable(${{{self._cmake_var_name}}} ${{CMAKE_SOURCE_DIR}}/{self._executable_file})\n\n"
                     )
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
+class LinkerGeneratorPart(IGeneratorPart):
+    def __init__(
+            self: object,
+            cmake_exe_var_name: str,
+            *cmake_lib_var_names
+    ):
+        self._cmake_exe_var_name = cmake_exe_var_name
+        self._cmake_lib_var_names = cmake_lib_var_names
+
+    def run(self: object, file) -> None:
+        self._write_target_link_libraries(file)
+
+    def _write_target_link_libraries(self: object, file) -> None:
+        file.write(f"target_link_libraries(${{{self._cmake_exe_var_name}}} PUBLIC\n")
+        for lib in self._cmake_lib_var_names:
+            file.write(f"${{{lib}}}\n")
+        file.write(f")\n\n")
