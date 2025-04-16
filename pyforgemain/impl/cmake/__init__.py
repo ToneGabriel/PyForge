@@ -15,12 +15,12 @@ def _get_include_dirs(include_path: str) -> list[str]:
     return ret
 
 
-def _get_sources(source_path: str) -> list[str]:
+def _get_sources(source_path: str, ignore: set[str]={}) -> list[str]:
     ret: list[str] = []
 
     for dirpath, _, filenames in os.walk(source_path):
         for filename in filenames:
-            if filename.endswith(('.c', '.cpp')):
+            if filename.endswith(('.c', '.cpp')) and filename not in ignore:
                 relative_path = os.path.relpath(os.path.join(dirpath, filename),
                                                 start=os.path.dirname(source_path))
                 ret.append(relative_path.replace(os.path.sep, '/'))
@@ -28,8 +28,17 @@ def _get_sources(source_path: str) -> list[str]:
     return ret
 
 
-def _get_executable(app_path: str) -> str:
-    pass
+def _get_executable(source_path: str) -> str:
+    main_files = {"main.c", "main.cpp"}
+
+    for dirpath, _, filenames in os.walk(source_path):
+        for filename in filenames:
+            if filename in main_files:
+                relative_path = os.path.relpath(os.path.join(dirpath, filename),
+                                                start=os.path.dirname(source_path))
+                return relative_path.replace(os.path.sep, '/')
+
+    return ""
 
 
 def generate(
@@ -48,11 +57,14 @@ def generate(
         cmakelists_path = os.path.join(project_root_path, "CMakeLists.txt")
         include_path = os.path.join(project_root_path, "include")
         source_path = os.path.join(project_root_path, "source")
-        app_path = os.path.join(project_root_path, "app")
+        test_path = os.path.join(project_root_path, "test")
 
         include_directories = _get_include_dirs(include_path)
         source_files = _get_sources(source_path)
-        executable_file = _get_executable(app_path)
+        executable_file = _get_executable(source_path)
+
+        test_source_files = _get_sources(test_path, ignore={"main.cpp"})
+        test_executable_file = _get_executable(test_path)
 
         builder = GeneratorBuilder(
                     project_name,
@@ -66,11 +78,14 @@ def generate(
                     cmake_compile_definitions,
                     include_directories,
                     source_files,
-                    executable_file
+                    executable_file,
+                    test_source_files,
+                    test_executable_file
                 )
 
         # Header is the same for all cases
         builder.add_header()
+        # builder.add_header_test()
 
         match project_build_type:
             case "app":
@@ -79,12 +94,16 @@ def generate(
             case "lib":
                 builder.add_static_library()
             case "dll":
-                builder.add_static_library()
                 builder.add_shared_library()
+                builder.add_static_library()
             case "tmp":
                 pass
             case _:
                 raise None
+        
+        # builder.add_static_library_test()
+        # builder.add_executable_test()
+        # builder.add_target_link_test()
 
         with open(cmakelists_path, "w") as cmakelists_root_open_file:
             builder.generator.run(cmakelists_root_open_file)

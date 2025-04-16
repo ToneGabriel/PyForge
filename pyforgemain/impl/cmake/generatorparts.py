@@ -1,24 +1,14 @@
 from .generator import IGeneratorPart
 
 
-_CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
-_TEST_EXECUTABLE_CMAKE_VAR_NAME = "TEST_EXECUTABLE_NAME"
-_PROJECT_EXECUTABLE_CMAKE_VAR_NAME = "PROJECT_EXECUTABLE_NAME"
-_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME = "PROJECT_STATIC_LIBRARY_NAME"
-_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME = "PROJECT_SHARED_LIBRARY_NAME"
-
-
 def _adapt_to_cmake_bool(value: bool) -> str:
     return "ON" if value else "OFF"
-
-
-# ==========================================================================================================================
-# ==========================================================================================================================
 
 
 class HeaderGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
+            cmake_minimum_required_version: str,
             project_name: str,
             project_version: str,
             c_language_standard: int,
@@ -28,6 +18,7 @@ class HeaderGeneratorPart(IGeneratorPart):
             cpp_language_standard_required: bool,
             cpp_compiler_extensions_required: bool
     ):
+        self._cmake_minimum_required_version = cmake_minimum_required_version
         self._project_name = project_name
         self._project_version = project_version
         self._c_language_standard = c_language_standard
@@ -44,7 +35,7 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._write_destination_specifications(file)
 
     def _write_cmake_minimum_required_version(self: object, file) -> None:
-        file.write( f"cmake_minimum_required(VERSION {_CMAKE_MINIMUM_REQUIRED_VERSION} FATAL_ERROR)\n\n")
+        file.write( f"cmake_minimum_required(VERSION {self._cmake_minimum_required_version} FATAL_ERROR)\n\n")
 
     def _write_project_specifications(self: object, file) -> None:
         file.write( f"project({self._project_name} "
@@ -73,13 +64,40 @@ class HeaderGeneratorPart(IGeneratorPart):
 # ==========================================================================================================================
 
 
-class StaticLibraryGeneratorPart(IGeneratorPart):
+class TestHeaderGeneratorPart(IGeneratorPart):
+    def __init__(self: object):
+        pass
+
+    def run(self: object, file) -> None:
+        file.write( f"include(FetchContent)\n")
+        file.write( f"FetchContent_Declare(\n"
+                    f"googletest\n"
+                    f"GIT_REPOSITORY https://github.com/google/googletest.git\n"
+                    f"GIT_TAG main\n"
+                    )
+        file.write(f")\n\n")
+
+        file.write( f"set(INSTALL_GTEST OFF CACHE BOOL \"Disable installation of googletest\" FORCE)\n\n")
+        file.write( f"FetchContent_MakeAvailable(googletest)\n\n")
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
+class LibraryGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
+            cmake_var_name: str,
+            type: str,
+            prefix: str,
             project_name: str,
             include_directories: list[str],
             source_files: list[str]
     ):
+        self._cmake_var_name = cmake_var_name
+        self._type = type
+        self._prefix = prefix
         self._project_name = project_name
         self._include_directories = include_directories
         self._source_files = source_files
@@ -90,56 +108,19 @@ class StaticLibraryGeneratorPart(IGeneratorPart):
         self._write_target_sources(file)
 
     def _write_static_library_header(self: object, file) -> None:
-        lib_name: str = self._project_name + "_static_lib"
-        file.write( f"set({_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME} \"{lib_name}\")\n"
-                    f"add_library(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} STATIC)\n\n"
-                    )
+        lib_name = self._prefix + self._project_name
+        file.write( f"set({self._cmake_var_name} \"{lib_name}\")\n"
+                    f"add_library(${{{self._cmake_var_name}}} {self._type})\n"
+                    f"set_target_properties(${{{self._cmake_var_name}}} PROPERTIES PREFIX \"\")\n\n")
 
     def _write_target_include_directories(self: object, file) -> None:
+        file.write(f"target_include_directories(${{{self._cmake_var_name}}} PUBLIC\n")
         for dir in self._include_directories:
-            file.write(f"target_include_directories(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC ${{CMAKE_SOURCE_DIR}}/{dir})\n")
-        file.write(f"\n")
-
-    def _write_target_sources(self: object, file) -> None:
-        file.write(f"target_sources(${{{_PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC\n")
-        for source in self._source_files:
-            file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
+            file.write(f"${{CMAKE_SOURCE_DIR}}/{dir}\n")
         file.write(f")\n\n")
 
-
-# ==========================================================================================================================
-# ==========================================================================================================================
-
-
-class SharedLibraryGeneratorPart(IGeneratorPart):
-    def __init__(
-            self: object,
-            project_name: str,
-            include_directories: list[str],
-            source_files: list[str]
-    ):
-        self._project_name = project_name
-        self._include_directories = include_directories
-        self._source_files = source_files
-
-    def run(self: object, file) -> None:
-        self._write_shared_library_header(file)
-        self._write_target_include_directories(file)
-        self._write_target_sources(file)
-
-    def _write_shared_library_header(self: object, file) -> None:
-        lib_name: str = self._project_name + "_shared_lib"
-        file.write( f"set({_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME} \"{lib_name}\")\n"
-                    f"add_library(${{{_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME}}} SHARED)\n\n"
-                    )
-
-    def _write_target_include_directories(self: object, file) -> None:
-        for dir in self._include_directories:
-            file.write(f"target_include_directories(${{{_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC ${{CMAKE_SOURCE_DIR}}/{dir})\n")
-        file.write(f"\n")
-
     def _write_target_sources(self: object, file) -> None:
-        file.write(f"target_sources(${{{_PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME}}} PUBLIC\n")
+        file.write(f"target_sources(${{{self._cmake_var_name}}} PUBLIC\n")
         for source in self._source_files:
             file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
         file.write(f")\n\n")
@@ -152,9 +133,13 @@ class SharedLibraryGeneratorPart(IGeneratorPart):
 class ExecutableGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
+            cmake_var_name: str,
+            prefix: str,
             project_name: str,
             executable_file: str
     ):
+        self._cmake_var_name = cmake_var_name
+        self._prefix = prefix
         self._project_name = project_name
         self._executable_file = executable_file
 
@@ -162,6 +147,7 @@ class ExecutableGeneratorPart(IGeneratorPart):
         self._write_executable_header(file)
 
     def _write_executable_header(self: object, file) -> None:
-        file.write( f"set({_PROJECT_EXECUTABLE_CMAKE_VAR_NAME} \"{self._project_name}\")\n"
-                    f"add_executable(${{{_PROJECT_EXECUTABLE_CMAKE_VAR_NAME}}} ${{CMAKE_SOURCE_DIR}}/{self._executable_file})\n\n"
+        exe_name = self._prefix + self._project_name
+        file.write( f"set({self._cmake_var_name} \"{exe_name}\")\n"
+                    f"add_executable(${{{self._cmake_var_name}}} ${{CMAKE_SOURCE_DIR}}/{self._executable_file})\n\n"
                     )
