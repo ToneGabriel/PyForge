@@ -118,7 +118,8 @@ class LibraryGeneratorPart(IGeneratorPart):
             prefix: str,
             project_name: str,
             include_directories: list[str],
-            source_files: list[str]
+            source_files: list[str],
+            compile_definitions: list[tuple[str, str]]
     ):
         self._cmake_var_name = cmake_var_name
         self._type = type
@@ -126,11 +127,13 @@ class LibraryGeneratorPart(IGeneratorPart):
         self._project_name = project_name
         self._include_directories = include_directories
         self._source_files = source_files
+        self._compile_definitions = compile_definitions
 
     def run(self: object, file) -> None:
         self._write_static_library_header(file)
         self._write_target_include_directories(file)
         self._write_target_sources(file)
+        self._write_compile_definitions(file)
 
     def _write_static_library_header(self: object, file) -> None:
         lib_name = self._prefix + self._project_name
@@ -148,6 +151,18 @@ class LibraryGeneratorPart(IGeneratorPart):
         file.write(f"target_sources(${{{self._cmake_var_name}}} PUBLIC\n")
         for source in self._source_files:
             file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
+        file.write(f")\n\n")
+
+    def _write_compile_definitions(self: object, file):
+        if not self._compile_definitions:
+            return
+
+        file.write(f"target_compile_definitions(${{{self._cmake_var_name}}} PRIVATE\n")
+        for macro, value in self._compile_definitions:
+            if not value:
+                file.write(f"{macro}\n")
+            else:
+                file.write(f"{macro}={value}\n")
         file.write(f")\n\n")
 
 

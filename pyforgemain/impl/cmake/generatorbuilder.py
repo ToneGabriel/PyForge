@@ -90,7 +90,8 @@ class GeneratorBuilder:
                                     _PROJECT_STATIC_LIBRARY_PREFIX,
                                     self._project_name,
                                     self._project_include_directories,
-                                    self._project_source_files
+                                    self._project_source_files,
+                                    self._cmake_compile_definitions
                                     )
                                 )
 
@@ -101,7 +102,8 @@ class GeneratorBuilder:
                                     _TEST_LIBRARY_PREFIX,
                                     self._project_name,
                                     self._project_include_directories,
-                                    self._test_source_files
+                                    self._test_source_files,
+                                    self._cmake_compile_definitions
                                     )
                                 )
 
@@ -112,7 +114,8 @@ class GeneratorBuilder:
                                     _PROJECT_SHARED_LIBRARY_PREFIX,
                                     self._project_name,
                                     self._project_include_directories,
-                                    self._project_source_files
+                                    self._project_source_files,
+                                    self._cmake_compile_definitions
                                     )
                                 )
 
