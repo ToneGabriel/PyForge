@@ -8,8 +8,8 @@ from .generatorparts import HeaderGeneratorPart,\
 
 _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
 
-_STATIC = "STATIC"
-_SHARED = "SHARED"
+_STATIC_LIBRARY_FLAG = "STATIC"
+_SHARED_LIBRARY_FLAG = "SHARED"
 
 _PROJECT_STATIC_LIBRARY_PREFIX = "slib_"
 _PROJECT_SHARED_LIBRARY_PREFIX = "dlib_"
@@ -40,9 +40,9 @@ class GeneratorBuilder:
             cpp_language_standard_required: bool,
             cpp_compiler_extensions_required: bool,
             cmake_compile_definitions: list,
-            include_directories: list,
-            source_files: list,
-            executable_file: str,
+            project_include_directories: list,
+            project_source_files: list,
+            project_executable_file: str,
             test_source_files: str,
             test_executable_file: str
     ):
@@ -55,18 +55,18 @@ class GeneratorBuilder:
         self._cpp_language_standard_required = cpp_language_standard_required
         self._cpp_compiler_extensions_required = cpp_compiler_extensions_required
         self._cmake_compile_definitions = cmake_compile_definitions
-        self._include_directories = include_directories
-        self._source_files = source_files
-        self._executable_file = executable_file
+        self._project_include_directories = project_include_directories
+        self._project_source_files = project_source_files
+        self._project_executable_file = project_executable_file
         self._test_source_files = test_source_files
         self._test_executable_file = test_executable_file
-        self.reset_generator()
+        self.reset_generator_product()
 
     @property
-    def generator(self: object) -> Generator:
+    def generator_product(self: object) -> Generator:
         return self._generator
 
-    def reset_generator(self: object) -> None:
+    def reset_generator_product(self: object) -> None:
         self._generator = Generator()
 
     def add_header(self: object) -> None:
@@ -83,56 +83,57 @@ class GeneratorBuilder:
                                     )
                                 )
 
-    def add_static_library_project(self: object) -> None:
+    def add_project_static_library(self: object) -> None:
         self._generator.add_part(LibraryGeneratorPart(
                                     _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _STATIC,
+                                    _STATIC_LIBRARY_FLAG,
                                     _PROJECT_STATIC_LIBRARY_PREFIX,
                                     self._project_name,
-                                    self._include_directories,
-                                    self._source_files
+                                    self._project_include_directories,
+                                    self._project_source_files
                                     )
                                 )
 
-    def add_static_library_test(self: object) -> None:
+    def add_test_static_library(self: object) -> None:
         self._generator.add_part(LibraryGeneratorPart(
                                     _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _STATIC,
+                                    _STATIC_LIBRARY_FLAG,
                                     _TEST_LIBRARY_PREFIX,
                                     self._project_name,
-                                    self._include_directories,
+                                    self._project_include_directories,
                                     self._test_source_files
                                     )
                                 )
 
-    def add_shared_library_project(self: object) -> None:
+    def add_project_shared_library(self: object) -> None:
         self._generator.add_part(LibraryGeneratorPart(
                                     _PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME,
-                                    _SHARED,
+                                    _SHARED_LIBRARY_FLAG,
                                     _PROJECT_SHARED_LIBRARY_PREFIX,
                                     self._project_name,
-                                    self._include_directories,
-                                    self._source_files
+                                    self._project_include_directories,
+                                    self._project_source_files
                                     )
                                 )
 
-    def add_googletest_library(self: object) -> None:
+    def add_googletest_configuration_then_include_dirs_to_test_static_library(self: object) -> None:
         self._generator.add_part(GoogleTestLibraryGeneratorPart(
                                     _GTEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _GMOCK_STATIC_LIBRARY_CMAKE_VAR_NAME
+                                    _GMOCK_STATIC_LIBRARY_CMAKE_VAR_NAME,
+                                    _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME
                                     )
                                 )
 
-    def add_executable_project(self: object) -> None:
+    def add_project_executable(self: object) -> None:
         self._generator.add_part(ExecutableGeneratorPart(
                                     _PROJECT_EXECUTABLE_CMAKE_VAR_NAME,
                                     _PROJECT_EXECUTABLE_PREFIX,
                                     self._project_name,
-                                    self._executable_file
+                                    self._project_executable_file
                                     )
                                 )
 
-    def add_executable_test(self: object) -> None:
+    def add_test_executable(self: object) -> None:
         self._generator.add_part(ExecutableGeneratorPart(
                                     _TEST_EXECUTABLE_CMAKE_VAR_NAME,
                                     _TEST_EXECUTABLE_PREFIX,
@@ -141,14 +142,14 @@ class GeneratorBuilder:
                                     )
                                 )
 
-    def add_target_linker_project(self: object) -> None:
+    def add_project_target_linker(self: object) -> None:
         self._generator.add_part(LinkerGeneratorPart(
                                     _PROJECT_EXECUTABLE_CMAKE_VAR_NAME,
                                     _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME
                                     )
                                 )
     
-    def add_target_linker_test(self: object) -> None:
+    def add_test_target_linker(self: object) -> None:
         self._generator.add_part(LinkerGeneratorPart(
                                     _TEST_EXECUTABLE_CMAKE_VAR_NAME,
                                     _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME,
@@ -158,7 +159,7 @@ class GeneratorBuilder:
                                     )
                                 )
 
-    def add_target_linker_template_test(self: object) -> None:
+    def add_test_template_target_linker(self: object) -> None:
         self._generator.add_part(LinkerGeneratorPart(
                                     _TEST_EXECUTABLE_CMAKE_VAR_NAME,
                                     _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME,

@@ -69,13 +69,16 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
             self: object,
             gtest_cmake_var_name: str,
             gmock_cmake_var_name: str,
+            static_lib_cmake_var_name: str
     ):
         self._gtest_cmake_var_name = gtest_cmake_var_name
         self._gmock_cmake_var_name = gmock_cmake_var_name
+        self._static_lib_cmake_var_name = static_lib_cmake_var_name
 
     def run(self: object, file) -> None:
         self._write_gtest_header(file)
         self._write_gtest_gmock_cmake_variables(file)
+        self._write_include_directories_to_static_lib(file)
 
     def _write_gtest_header(self: object, file) -> None:
         file.write( f"include(FetchContent)\n")
@@ -94,6 +97,13 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
         file.write( f"set({self._gtest_cmake_var_name} gtest)\n"
                     f"set({self._gtest_cmake_var_name} gmock)\n\n"
                     )
+
+    def _write_include_directories_to_static_lib(self: object, file) -> None:
+        file.write(f"target_include_directories(${{{self._static_lib_cmake_var_name}}} PUBLIC\n"
+                   f"${{gtest_SOURCE_DIR}}/include\n"
+                   f"${{gmock_SOURCE_DIR}}/include\n"
+                   )
+        file.write(f")\n\n")
 
 
 # ==========================================================================================================================
