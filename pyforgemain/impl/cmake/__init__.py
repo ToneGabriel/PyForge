@@ -1,8 +1,11 @@
 import os
-import shutil
 import subprocess
 
 from .generatorbuilder import GeneratorBuilder
+
+
+_MAIN_FILE_NAMES = {"main.c", "main.cpp"}
+_SOURCE_EXTENSIONS = (".c", ".cpp")
 
 
 def _get_include_dirs(include_path: str) -> list[str]:
@@ -15,12 +18,12 @@ def _get_include_dirs(include_path: str) -> list[str]:
     return ret
 
 
-def _get_sources(source_path: str, ignore: set[str]={}) -> list[str]:
+def _get_sources(source_path: str) -> list[str]:
     ret: list[str] = []
 
     for dirpath, _, filenames in os.walk(source_path):
         for filename in filenames:
-            if filename.endswith(('.c', '.cpp')) and filename not in ignore:
+            if filename.endswith(_SOURCE_EXTENSIONS) and filename not in _MAIN_FILE_NAMES:
                 relative_path = os.path.relpath(os.path.join(dirpath, filename),
                                                 start=os.path.dirname(source_path))
                 ret.append(relative_path.replace(os.path.sep, '/'))
@@ -29,11 +32,9 @@ def _get_sources(source_path: str, ignore: set[str]={}) -> list[str]:
 
 
 def _get_executable(source_path: str) -> str:
-    main_files = {"main.c", "main.cpp"}
-
     for dirpath, _, filenames in os.walk(source_path):
         for filename in filenames:
-            if filename in main_files:
+            if filename in _MAIN_FILE_NAMES:
                 relative_path = os.path.relpath(os.path.join(dirpath, filename),
                                                 start=os.path.dirname(source_path))
                 return relative_path.replace(os.path.sep, '/')
@@ -63,7 +64,7 @@ def generate(
         source_files = _get_sources(source_path)
         executable_file = _get_executable(source_path)
 
-        test_source_files = _get_sources(test_path, ignore={"main.cpp"})
+        test_source_files = _get_sources(test_path)
         test_executable_file = _get_executable(test_path)
 
         builder = GeneratorBuilder(
@@ -124,7 +125,8 @@ def build(
 
     if clean:
         if os.path.exists(build_path) and os.path.isdir(build_path):
-            shutil.rmtree(build_path)
+            cmd_delete_build = f"rmdir /s /q \"{build_path}\""
+            subprocess.check_call(cmd_delete_build, shell=True)
 
     cmd_generate_text = f"cmake -S \"{project_root_path}\" -G \"{cmake_generator}\" -B \"{build_path}\""
 

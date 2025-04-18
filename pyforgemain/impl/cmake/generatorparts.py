@@ -95,7 +95,7 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
 
     def _write_gtest_gmock_cmake_variables(self: object, file) -> None:
         file.write( f"set({self._gtest_cmake_var_name} gtest)\n"
-                    f"set({self._gtest_cmake_var_name} gmock)\n\n"
+                    f"set({self._gmock_cmake_var_name} gmock)\n\n"
                     )
 
     def _write_include_directories_to_static_lib(self: object, file) -> None:
@@ -131,9 +131,9 @@ class LibraryGeneratorPart(IGeneratorPart):
 
     def run(self: object, file) -> None:
         self._write_static_library_header(file)
+        self._write_compile_definitions(file)
         self._write_target_include_directories(file)
         self._write_target_sources(file)
-        self._write_compile_definitions(file)
 
     def _write_static_library_header(self: object, file) -> None:
         lib_name = self._prefix + self._project_name
