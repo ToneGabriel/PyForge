@@ -114,7 +114,7 @@ class LibraryGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
             cmake_var_name: str,
-            type: str,
+            type_flag: str,
             prefix: str,
             project_name: str,
             include_directories: list[str],
@@ -122,7 +122,7 @@ class LibraryGeneratorPart(IGeneratorPart):
             compile_definitions: list[tuple[str, str]]
     ):
         self._cmake_var_name = cmake_var_name
-        self._type = type
+        self._type_flag = type_flag
         self._prefix = prefix
         self._project_name = project_name
         self._include_directories = include_directories
@@ -138,8 +138,8 @@ class LibraryGeneratorPart(IGeneratorPart):
     def _write_static_library_header(self: object, file) -> None:
         lib_name = self._prefix + self._project_name
         file.write( f"set({self._cmake_var_name} \"{lib_name}\")\n"
-                    f"add_library(${{{self._cmake_var_name}}} {self._type})\n"
-                    f"set_target_properties(${{{self._cmake_var_name}}} PROPERTIES PREFIX \"\")\n\n")
+                    f"add_library(${{{self._cmake_var_name}}} {self._type_flag})\n"
+                    f"set_target_properties(${{{self._cmake_var_name}}} PROPERTIES PREFIX \"\" IMPORT_PREFIX \"\")\n\n")
 
     def _write_target_include_directories(self: object, file) -> None:
         file.write(f"target_include_directories(${{{self._cmake_var_name}}} PUBLIC\n")
