@@ -87,28 +87,29 @@ def generate(
         # Header is the same for all cases
         builder.add_header()
 
-        # Add test static library and include googletest headers to it
+        # Add test static library and link it to googletest
+        builder.add_googletest_static_library()
         builder.add_test_static_library()
         builder.add_test_executable()
-        builder.add_googletest_configuration_then_include_dirs_to_test_static_library()
+        builder.add_test_static_library_to_googletest_linker()
 
         match project_build_type:
             case "app":
                 builder.add_project_static_library()
                 builder.add_project_executable()
-                builder.add_project_target_linker()
-                builder.add_test_target_linker()
+                builder.add_project_executable_to_project_static_library_linker()
             case "lib":
                 builder.add_project_static_library()
-                builder.add_test_target_linker()
             case "dll":
-                builder.add_project_shared_library()
                 builder.add_project_static_library()
-                builder.add_test_target_linker()
+                builder.add_project_shared_library()
             case "tmp":
-                builder.add_test_template_target_linker()
+                builder.add_project_template_static_library()
             case _:
                 raise None
+
+        builder.add_test_static_library_to_project_static_library_linker()
+        builder.add_test_executable_to_test_static_library_linker()
 
         with open(cmakelists_path, "w") as cmakelists_root_open_file:
             builder.generator_product.run(cmakelists_root_open_file)

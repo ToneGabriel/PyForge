@@ -68,17 +68,14 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
             gtest_cmake_var_name: str,
-            gmock_cmake_var_name: str,
-            static_lib_cmake_var_name: str
+            gmock_cmake_var_name: str
     ):
         self._gtest_cmake_var_name = gtest_cmake_var_name
         self._gmock_cmake_var_name = gmock_cmake_var_name
-        self._static_lib_cmake_var_name = static_lib_cmake_var_name
 
     def run(self: object, file) -> None:
         self._write_gtest_header(file)
         self._write_gtest_gmock_cmake_variables(file)
-        self._write_include_directories_to_static_lib(file)
 
     def _write_gtest_header(self: object, file) -> None:
         file.write( f"include(FetchContent)\n")
@@ -97,13 +94,6 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
         file.write( f"set({self._gtest_cmake_var_name} gtest)\n"
                     f"set({self._gmock_cmake_var_name} gmock)\n\n"
                     )
-
-    def _write_include_directories_to_static_lib(self: object, file) -> None:
-        file.write(f"target_include_directories(${{{self._static_lib_cmake_var_name}}} PUBLIC\n"
-                   f"${{gtest_SOURCE_DIR}}/include\n"
-                   f"${{gmock_SOURCE_DIR}}/include\n"
-                   )
-        file.write(f")\n\n")
 
 
 # ==========================================================================================================================
@@ -137,17 +127,23 @@ class LibraryGeneratorPart(IGeneratorPart):
 
     def _write_static_library_header(self: object, file) -> None:
         lib_name = self._prefix + self._project_name
-        file.write( f"set({self._cmake_var_name} \"{lib_name}\")\n"
+        file.write( f"set({self._cmake_var_name} {lib_name})\n"
                     f"add_library(${{{self._cmake_var_name}}} {self._type_flag})\n"
                     f"set_target_properties(${{{self._cmake_var_name}}} PROPERTIES PREFIX \"\" IMPORT_PREFIX \"\")\n\n")
 
     def _write_target_include_directories(self: object, file) -> None:
+        if not self._include_directories:
+            return
+
         file.write(f"target_include_directories(${{{self._cmake_var_name}}} PUBLIC\n")
         for dir in self._include_directories:
             file.write(f"${{CMAKE_SOURCE_DIR}}/{dir}\n")
         file.write(f")\n\n")
 
     def _write_target_sources(self: object, file) -> None:
+        if not self._source_files:
+            return
+
         file.write(f"target_sources(${{{self._cmake_var_name}}} PUBLIC\n")
         for source in self._source_files:
             file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
@@ -188,7 +184,7 @@ class ExecutableGeneratorPart(IGeneratorPart):
 
     def _write_executable_header(self: object, file) -> None:
         exe_name = self._prefix + self._project_name
-        file.write( f"set({self._cmake_var_name} \"{exe_name}\")\n"
+        file.write( f"set({self._cmake_var_name} {exe_name})\n"
                     f"add_executable(${{{self._cmake_var_name}}} ${{CMAKE_SOURCE_DIR}}/{self._executable_file})\n\n"
                     )
 
@@ -200,17 +196,17 @@ class ExecutableGeneratorPart(IGeneratorPart):
 class LinkerGeneratorPart(IGeneratorPart):
     def __init__(
             self: object,
-            cmake_exe_var_name: str,
+            cmake_target_var_name: str,
             *cmake_lib_var_names
     ):
-        self._cmake_exe_var_name = cmake_exe_var_name
+        self._cmake_target_var_name = cmake_target_var_name
         self._cmake_lib_var_names = cmake_lib_var_names
 
     def run(self: object, file) -> None:
         self._write_target_link_libraries(file)
 
     def _write_target_link_libraries(self: object, file) -> None:
-        file.write(f"target_link_libraries(${{{self._cmake_exe_var_name}}} PUBLIC\n")
+        file.write(f"target_link_libraries(${{{self._cmake_target_var_name}}} PUBLIC\n")
         for lib in self._cmake_lib_var_names:
             file.write(f"${{{lib}}}\n")
         file.write(f")\n\n")

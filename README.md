@@ -1,4 +1,4 @@
-# BuildPY
+# PyForge
 
 ## Overview
 This project is a C/C++ build automation tool powered by Python, leveraging CMake for project configuration. The project setup is customizable via a JSON configuration file.

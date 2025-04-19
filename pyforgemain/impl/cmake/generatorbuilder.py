@@ -10,6 +10,7 @@ _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
 
 _STATIC_LIBRARY_FLAG = "STATIC"
 _SHARED_LIBRARY_FLAG = "SHARED"
+_INTERFACE_LIBRARY_FLAG = "INTERFACE"
 
 _PROJECT_STATIC_LIBRARY_PREFIX = "slib_"
 _PROJECT_SHARED_LIBRARY_PREFIX = "dlib_"
@@ -95,18 +96,6 @@ class GeneratorBuilder:
                                     )
                                 )
 
-    def add_test_static_library(self: object) -> None:
-        self._generator.add_part(LibraryGeneratorPart(
-                                    _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _STATIC_LIBRARY_FLAG,
-                                    _TEST_LIBRARY_PREFIX,
-                                    self._project_name,
-                                    self._project_include_directories,
-                                    self._test_source_files,
-                                    self._cmake_compile_definitions
-                                    )
-                                )
-
     def add_project_shared_library(self: object) -> None:
         self._generator.add_part(LibraryGeneratorPart(
                                     _PROJECT_SHARED_LIBRARY_CMAKE_VAR_NAME,
@@ -119,11 +108,34 @@ class GeneratorBuilder:
                                     )
                                 )
 
-    def add_googletest_configuration_then_include_dirs_to_test_static_library(self: object) -> None:
+    def add_project_template_static_library(self: object) -> None:
+        self._generator.add_part(LibraryGeneratorPart(
+                                    _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME,
+                                    _INTERFACE_LIBRARY_FLAG,
+                                    _PROJECT_STATIC_LIBRARY_PREFIX,
+                                    self._project_name,
+                                    self._project_include_directories,
+                                    None,   # no source files (only headers)
+                                    self._cmake_compile_definitions
+                                    )
+                                )
+
+    def add_test_static_library(self: object) -> None:
+        self._generator.add_part(LibraryGeneratorPart(
+                                    _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
+                                    _STATIC_LIBRARY_FLAG,
+                                    _TEST_LIBRARY_PREFIX,
+                                    self._project_name,
+                                    None,   # no include directories (provided by googletest and project static library)
+                                    self._test_source_files,
+                                    self._cmake_compile_definitions
+                                    )
+                                )
+
+    def add_googletest_static_library(self: object) -> None:
         self._generator.add_part(GoogleTestLibraryGeneratorPart(
                                     _GTEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _GMOCK_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME
+                                    _GMOCK_STATIC_LIBRARY_CMAKE_VAR_NAME
                                     )
                                 )
 
@@ -145,28 +157,31 @@ class GeneratorBuilder:
                                     )
                                 )
 
-    def add_project_target_linker(self: object) -> None:
+    def add_project_executable_to_project_static_library_linker(self: object) -> None:
         self._generator.add_part(LinkerGeneratorPart(
                                     _PROJECT_EXECUTABLE_CMAKE_VAR_NAME,
                                     _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME
                                     )
                                 )
-    
-    def add_test_target_linker(self: object) -> None:
+
+    def add_test_static_library_to_googletest_linker(self: object) -> None:
         self._generator.add_part(LinkerGeneratorPart(
-                                    _TEST_EXECUTABLE_CMAKE_VAR_NAME,
-                                    _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME,
                                     _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
                                     _GTEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
                                     _GMOCK_STATIC_LIBRARY_CMAKE_VAR_NAME
                                     )
                                 )
+    
+    def add_test_static_library_to_project_static_library_linker(self: object) -> None:
+        self._generator.add_part(LinkerGeneratorPart(
+                                    _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
+                                    _PROJECT_STATIC_LIBRARY_CMAKE_VAR_NAME
+                                    )
+                                )
 
-    def add_test_template_target_linker(self: object) -> None:
+    def add_test_executable_to_test_static_library_linker(self: object) -> None:
         self._generator.add_part(LinkerGeneratorPart(
                                     _TEST_EXECUTABLE_CMAKE_VAR_NAME,
-                                    _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _GTEST_STATIC_LIBRARY_CMAKE_VAR_NAME,
-                                    _GMOCK_STATIC_LIBRARY_CMAKE_VAR_NAME
+                                    _TEST_STATIC_LIBRARY_CMAKE_VAR_NAME
                                     )
                                 )
