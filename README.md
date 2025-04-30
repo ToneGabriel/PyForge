@@ -4,7 +4,7 @@
 This project is a C/C++ build automation tool powered by Python, leveraging CMake for project configuration. The project setup is customizable via a JSON configuration file.
 
 ## Requirements
-- **Python Minimum Version `3.11`**
+- **Admin rights to install/uninstall**
 - **C/C++ Compiler for your project**
 
 ## How to Use
