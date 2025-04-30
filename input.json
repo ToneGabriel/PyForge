@@ -1,0 +1,37 @@
+{
+    "project_settings":
+    {
+        "root": "path/to/your/project/root/folder",
+        "name": "your_project_name",
+        "version":
+        {
+            "major": 0,
+            "minor": 0,
+            "patch": 0
+        },
+        "product": "app",
+        "build": "_NOT_IMPLEMENTED",
+        "compile_definitions":
+        [
+            ["DEF_EXAMPLE", ""],
+            ["DEF_VAL_EXAMPLE", "value"],
+            ["DEF_STR_EXAMPLE", "\"string\""]
+        ]
+    },
+
+    "c_settings":
+    {
+        "compiler_path": "path/to/your/c/compiler/exe",
+        "compiler_extensions_required": false,
+        "language_standard": 17,
+        "language_standard_required": true
+    },
+
+    "cpp_settings":
+    {
+        "compiler_path": "path/to/your/cpp/compiler/exe",
+        "compiler_extensions_required": false,
+        "language_standard": 20,
+        "language_standard_required": true
+    }
+}
