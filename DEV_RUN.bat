@@ -14,7 +14,7 @@ echo [INFO] Activating environment and running app...
 
 call !VENV_DIR!\Scripts\activate
 
-py ./app --json ./input.json --structure ./deps/structure.zip
+py ./app
 
 call !VENV_DIR!\Scripts\deactivate
 

@@ -22,7 +22,7 @@ Name "PyForge"
 
 ;--------------------------------
 ; Languages
-; !insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "English"
 ; LangString WELCOME_TITLE ${LANG_ENGLISH} "Welcome to the PyForge Setup"
 ; LangString WELCOME_TEXT ${LANG_ENGLISH} "This wizard will guide you through the installation of PyForge.$\r$\n$\r$\nClick Next to continue."
 

@@ -1,30 +1,13 @@
-from argparse import ArgumentParser
-
+import config
 import menu
 import impl
 
 
-def _get_parser() -> ArgumentParser:
-    parser = ArgumentParser(description="Arguments to generate and/or build a C/C++ project with CMake.",
-                            conflict_handler="resolve"
-                            )
-
-    parser.add_argument("--json",
-                        type=str,
-                        required=True,
-                        help="Path to the setup JSON file"
-                        )
-    
-    parser.add_argument("--structure",
-                        type=str,
-                        required=True,
-                        help="Path to the project structure .zip file"
-                        )
-
-    return parser
-
-
-def main(json_path, zip_structure_path) -> None:
+def main(json_path: str,
+         zip_structure_path: str,
+         cmake_bin_path: str,
+         ninja_bin_path: str
+) -> None:
     main_menu = menu.OptionsMenu()
 
     main_menu.set_header_text("PyForge")
@@ -38,5 +21,8 @@ def main(json_path, zip_structure_path) -> None:
 
 
 if __name__ == "__main__":
-    args = _get_parser().parse_args()
-    main(args.json, args.structure)
+    main(config.JSON_PATH,
+         config.STRUCTURE_ZIP_PATH,
+         config.CMAKE_BIN_PATH,
+         config.NINJA_BIN_PATH
+         )
