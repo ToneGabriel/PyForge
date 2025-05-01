@@ -6,15 +6,15 @@ for /f "tokens=2 delims=::" %%a in ('DEV_VENV.bat ^| findstr "::RETURN::"') do (
 )
 
 :: ===============================================
-:: Run PyForge
+:: Build PyForge
 :: ===============================================
 
 echo.
-echo [INFO] Activating environment and running app...
+echo [INFO] Activating environment and running build...
 
 call !VENV_DIR!\Scripts\activate
 
-py ./app --json ./input.json --structure ./deps/structure.zip
+pyinstaller --onefile --name=pyforge ./app/__main__.py
 
 call !VENV_DIR!\Scripts\deactivate
 
