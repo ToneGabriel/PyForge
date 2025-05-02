@@ -24,9 +24,11 @@ _PROJECT_EXTERN_DIR_NAME = "extern"
 def _get_include_dirs(dir_path: str) -> list[str]:
     ret: list[str] = []
 
-    for dirpath, _, _ in os.walk(dir_path):
-        relative_path = os.path.relpath(dirpath, start=os.path.dirname(dir_path))
-        ret.append(relative_path.replace(os.path.sep, '/'))
+    for current_dir_path, _, _ in os.walk(dir_path):
+        relative_path = os.path.relpath(path=current_dir_path,
+                                        start=os.path.dirname(dir_path)
+                                        )
+        ret.append(relative_path)
 
     return ret
 
@@ -34,23 +36,25 @@ def _get_include_dirs(dir_path: str) -> list[str]:
 def _get_sources(dir_path: str) -> str:
     ret: list[str] = []
 
-    for dirpath, _, filenames in os.walk(dir_path):
-        for filename in filenames:
+    for current_dir_path, _, current_dir_filenames in os.walk(dir_path):
+        for filename in current_dir_filenames:
             if filename.endswith(_SOURCE_EXTENSIONS) and filename not in _MAIN_FILE_NAMES:
-                relative_path = os.path.relpath(os.path.join(dirpath, filename),
-                                                start=os.path.dirname(dir_path))
-                ret.append(relative_path.replace(os.path.sep, '/'))
+                relative_path = os.path.relpath(path=os.path.join(current_dir_path, filename),
+                                                start=os.path.dirname(dir_path)
+                                                )
+                ret.append(relative_path)
 
     return ret
 
 
 def _get_executable(dir_path: str) -> str:
-    for dirpath, _, filenames in os.walk(dir_path):
-        for filename in filenames:
+    for current_dir_path, _, current_dir_filenames in os.walk(dir_path):
+        for filename in current_dir_filenames:
             if filename in _MAIN_FILE_NAMES:
-                relative_path = os.path.relpath(os.path.join(dirpath, filename),
-                                                start=os.path.dirname(dir_path))
-                return relative_path.replace(os.path.sep, '/')
+                relative_path = os.path.relpath(path=os.path.join(current_dir_path, filename),
+                                                start=os.path.dirname(dir_path)
+                                                )
+                return relative_path
 
     return ""
 
@@ -59,8 +63,8 @@ def _get_executable(dir_path: str) -> str:
 # ==========================================================================================================================
 
 
-def get_cmakelists_file_path(root_path: str) -> str:
-    return os.path.join(root_path, _CMAKELISTS_FILE_NAME)
+def get_cmakelists_file_path(project_root_path: str) -> str:
+    return os.path.join(project_root_path, _CMAKELISTS_FILE_NAME)
 
 
 def get_build_dir_path(project_root_path: str) -> str:

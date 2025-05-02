@@ -1,7 +1,7 @@
 {
     "project_settings":
     {
-        "root": "path/to/your/project/root/folder",
+        "root": "path\\to\\your\\project\\root\\folder",
         "name": "your_project_name",
         "version":
         {
@@ -21,7 +21,7 @@
 
     "c_settings":
     {
-        "compiler_path": "path/to/your/c/compiler/exe",
+        "compiler_path": "path\\to\\your\\c\\compiler\\exe",
         "compiler_extensions_required": false,
         "language_standard": 17,
         "language_standard_required": true
@@ -29,7 +29,7 @@
 
     "cpp_settings":
     {
-        "compiler_path": "path/to/your/cpp/compiler/exe",
+        "compiler_path": "path\\to\\your\\cpp\\compiler\\exe",
         "compiler_extensions_required": false,
         "language_standard": 20,
         "language_standard_required": true

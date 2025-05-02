@@ -14,8 +14,16 @@ class CMakeTargetVisibility(Enum):
     INTERFACE = "INTERFACE"
 
 
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
 def _adapt_to_cmake_bool(value: bool) -> str:
     return "ON" if value else "OFF"
+
+
+def _adapt_to_cmake_path_separator(path: str) -> str:
+    return path.replace("\\", "/")
 
 
 # ==========================================================================================================================
@@ -167,7 +175,7 @@ class ExecutableGeneratorPart(IGeneratorPart):
 
     def _write_executable_header(self: object, file) -> None:
         file.write( f"set({self.cmake_variable_name} {self._name})\n"
-                    f"add_executable(${{{self.cmake_variable_name}}} ${{CMAKE_SOURCE_DIR}}/{self._executable_file})\n\n"
+                    f"add_executable(${{{self.cmake_variable_name}}} ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._executable_file)})\n\n"
                     )
 
 
@@ -194,7 +202,7 @@ class IncludeGeneratorPart(IGeneratorPart):
 
         file.write(f"target_include_directories(${{{self._cmake_target_var_name}}} {self._visibility.value}\n")
         for dir in self._include_directories:
-            file.write(f"${{CMAKE_SOURCE_DIR}}/{dir}\n")
+            file.write(f"${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(dir)}\n")
         file.write(f")\n\n")
 
 
@@ -221,7 +229,7 @@ class SourceGeneratorPart(IGeneratorPart):
 
         file.write(f"target_sources(${{{self._cmake_target_var_name}}} {self._visibility.value}\n")
         for source in self._source_files:
-            file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
+            file.write(f"${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(source)}\n")
         file.write(f")\n\n")
 
 
