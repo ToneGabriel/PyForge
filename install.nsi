@@ -1,17 +1,18 @@
 !include "MUI2.nsh"
 
-#--------------------------------
-# Window Title
+;--------------------------------
+; Window Title
 Caption "PyForge Setup"
+Name "PyForge"
 
-#--------------------------------
-# Set welcome text
-!define MUI_WELCOMEPAGE_TITLE $(WELCOME_TITLE)
-!define MUI_WELCOMEPAGE_TEXT $(WELCOME_TEXT)
+;--------------------------------
+; Set welcome text and logo
+; !define MUI_WELCOMEPAGE_TITLE $(WELCOME_TITLE)
+; !define MUI_WELCOMEPAGE_TEXT $(WELCOME_TEXT)
 ; !define MUI_WELCOMEFINISHPAGE_BITMAP "installer_logo.bmp"
 
-#--------------------------------
-# Installer UI
+;--------------------------------
+; Installer UI
 !insertmacro MUI_PAGE_WELCOME
 ; !insertmacro MUI_PAGE_LICENSE "license.txt"
 !insertmacro MUI_PAGE_COMPONENTS
@@ -19,29 +20,29 @@ Caption "PyForge Setup"
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_UNPAGE_INSTFILES
 
-#--------------------------------
-# Languages
+;--------------------------------
+; Languages
 !insertmacro MUI_LANGUAGE "English"
-LangString WELCOME_TITLE ${LANG_ENGLISH} "Welcome to the PyForge Setup"
-LangString WELCOME_TEXT ${LANG_ENGLISH} "This wizard will guide you through the installation of PyForge.$\r$\n$\r$\nClick Next to continue."
+; LangString WELCOME_TITLE ${LANG_ENGLISH} "Welcome to the PyForge Setup"
+; LangString WELCOME_TEXT ${LANG_ENGLISH} "This wizard will guide you through the installation of PyForge.$\r$\n$\r$\nClick Next to continue."
 
-#--------------------------------
-# Installer Info
+;--------------------------------
+; Installer Info
 RequestExecutionLevel admin
 OutFile "pyforge-setup.exe"
 InstallDir $PROGRAMFILES\PyForge
 
-#--------------------------------
-# Sections
+;--------------------------------
+; Sections
 
 Section "Core Files" SEC01
-  SectionIn RO  # always selected
+  SectionIn RO  ; always selected
 
   SetOutPath $INSTDIR\deps
   File /r .\deps\*.*
 
   SetOutPath $INSTDIR
-  File .\dist\pyforge.exe  # created by pyinstaller
+  File .\dist\pyforge.exe  ; created by pyinstaller
   File .\input.json
 SectionEnd
 
@@ -50,8 +51,8 @@ Section "Readme" SEC02
   File .\README.md
 SectionEnd
 
-#--------------------------------
-# Write Uninstaller
+;--------------------------------
+; Write Uninstaller
 
 Section -PostInstall
   WriteUninstaller $INSTDIR\uninstall.exe
@@ -61,8 +62,8 @@ Section "Uninstall"
   RMDir /r $INSTDIR
 SectionEnd
 
-#--------------------------------
-# Section Descriptions
+;--------------------------------
+; Section Descriptions
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Installs the PyForge core application and dependencies"
