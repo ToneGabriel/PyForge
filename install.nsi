@@ -42,7 +42,7 @@ Section "Core Files" SEC01
   File /r .\deps\*.*
 
   SetOutPath $INSTDIR
-  File .\dist\pyforge.exe  ; created by pyinstaller
+  File .\.pyinstaller.out\dist\pyforge.exe  ; created by pyinstaller
   File .\input.json
 SectionEnd
 
