@@ -1,6 +1,7 @@
 from ._cmd_base import CMDList
 from ._cmd_parts import CMakeGeneratePart,\
                         CMakeBuildPart,\
+                        CMakeBuildClearPart,\
                         CMakeBuildType,\
                         CMakeGeneratorFlag
 
@@ -12,15 +13,15 @@ __all__ = ["CMDBuilder",
 
 
 class CMDBuilder:
-    def __init__(self: object):
-        self.reset_cmd_product()
+    def __init__(self: object, *env_paths: str):
+        self.reset_cmd_product(*env_paths)
 
     @property
     def cmd_product(self: object) -> CMDList:
         return self._cmd_list
 
-    def reset_cmd_product(self: object) -> None:
-        self._cmd_list = CMDList()
+    def reset_cmd_product(self: object, *env_paths: str) -> None:
+        self._cmd_list = CMDList(*env_paths)
 
     def add_cmake_generate_part(self: object,
                                 cmakelists_root_dir_path: str,
@@ -40,10 +41,13 @@ class CMDBuilder:
         self._cmd_list.add_part(part)
 
     def add_cmake_build_part(self: object,
-                             build_dir_path: str,
-                             clean: bool
+                             build_dir_path: str
     ) -> None:
-        part = CMakeBuildPart(build_dir_path,
-                              clean
-                              )
+        part = CMakeBuildPart(build_dir_path)
+        self._cmd_list.add_part(part)
+
+    def add_cmake_build_clear_part(self: object,
+                                   build_dir_path: str
+    ) -> None:
+        part = CMakeBuildClearPart(build_dir_path)
         self._cmd_list.add_part(part)

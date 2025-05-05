@@ -63,11 +63,23 @@ class _Dataset(metaclass=_SingletonMeta):
 
     def initialize(self: object,
                    json_path: str,
+                   cmake_bin_path: str,
+                   ninja_bin_path: str,
                    zip_structure_path: str
     ) -> None:
         # override prev config if any
         self._data = jsonvalid.load(json_path, _EXPECTED_BUILD_JSON_STRUCTURE)
+        self._data["cmake_bin_path"] = cmake_bin_path
+        self._data["ninja_bin_path"] = ninja_bin_path
         self._data["zip_structure_path"] = zip_structure_path
+
+    @property
+    def cmake_bin_path(self: object) -> str:
+        return self._data["cmake_bin_path"]
+    
+    @property
+    def ninja_bin_path(self: object) -> str:
+        return self._data["ninja_bin_path"]
 
     @property
     def zip_structure_path(self: object) -> str:
@@ -144,10 +156,12 @@ def _get_dataset() -> _Dataset:
 
 
 def initialize(json_path: str,
+               cmake_bin_path: str,
+               ninja_bin_path: str,
                zip_structure_path: str
     ) -> None:
     data = _Dataset()
-    data.initialize(json_path, zip_structure_path)
+    data.initialize(json_path, cmake_bin_path, ninja_bin_path, zip_structure_path)
 
 
 def setup_project_structure() -> None:
@@ -176,4 +190,6 @@ def build_project(clean: bool=False) -> None:
     cmake.build(project_root_path=data.project_root_path,
                 c_compiler_path=data.c_compiler_path,
                 cpp_compiler_path=data.cpp_compiler_path,
+                cmake_bin_path=data.cmake_bin_path,
+                ninja_bin_path=data.ninja_bin_path,
                 clean=clean)

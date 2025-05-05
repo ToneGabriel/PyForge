@@ -169,11 +169,16 @@ def build(
         project_root_path: str,
         c_compiler_path: str=None,
         cpp_compiler_path: str=None,
+        cmake_bin_path: str=None,
+        ninja_bin_path: str=None,
         clean: bool=False
 ) -> None:
     build_dir_path = devfiles.get_build_dir_path(project_root_path)
 
-    builder = CMDBuilder()
+    builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
+
+    if clean:
+        builder.add_cmake_build_clear_part(build_dir_path)
 
     builder.add_cmake_generate_part(project_root_path,
                                     CMakeGeneratorFlag.NINJA,
@@ -183,6 +188,6 @@ def build(
                                     cpp_compiler_path
                                     )
 
-    builder.add_cmake_build_part(build_dir_path, clean)
+    builder.add_cmake_build_part(build_dir_path)
 
     builder.cmd_product.run()

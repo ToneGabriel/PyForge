@@ -51,15 +51,20 @@ class CMakeGeneratePart(ICMDPart):
 class CMakeBuildPart(ICMDPart):
     def __init__(self: object,
                  build_dir_path: str,
-                 clean: bool=False
     ):
         self._build_dir_path = build_dir_path
-        self._clean = clean
 
     def get_cmd_text(self: object) -> str:
         ret = f"cmake --build \"{self._build_dir_path}\""
+        return ret
 
-        if self._clean:
-            ret += f" --clean-first"
-        
+
+class CMakeBuildClearPart(ICMDPart):
+    def __init__(self: object,
+                 build_dir_path: str
+    ):
+        self._build_dir_path = build_dir_path
+
+    def get_cmd_text(self: object) -> str:
+        ret = f"rmdir /s /q \"{self._build_dir_path}\""
         return ret

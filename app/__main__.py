@@ -11,7 +11,7 @@ def main(json_path: str,
     main_menu = menu.OptionsMenu()
 
     main_menu.set_header_text("PyForge")
-    main_menu.add_option("Initialize", impl.initialize, json_path, zip_structure_path)
+    main_menu.add_option("Initialize", impl.initialize, json_path, cmake_bin_path, ninja_bin_path, zip_structure_path)
     main_menu.add_option("Setup Project Structure", impl.setup_project_structure)
     main_menu.add_option("Generate CMakeLists", impl.generate_cmakelists)
     main_menu.add_option("Build Project", impl.build_project)
