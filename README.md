@@ -8,12 +8,17 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 - **C/C++ Compiler for your project**
 
 ## How to Use
+0. Install using `pyforge-setup.exe`
 1. Create an EMPTY folder where you want the project.
 2. Modify the `input.JSON` configuration file to customize compiler paths and project settings. Ensure the selected compiler supports the specified settings.
-3. Start PyForge with `RUN.bat`
+3. Start PyForge with `pyforge.exe`
 4. Select `Initialize` first to load input data. Can change input data and use `Initialize` again while the program runs.
 5. Select `Setup project structure` to create the base folders and files.
-6. Create you project files (ex: `.h`, `.c`) using the existing folders (can create any subfolder structure).
+6. Create you project files (ex: `.h`, `.c`) using the existing folders.
+    - 6.1. Write headers in `include` folder
+    - 6.2. Write sources in `source` folder
+    - 6.3. Write test sources in `test` folder
+    - 6.4. Can create any subfolder structure.
 7. Select `Generate CMakeLists` to setup the build process.
 8. Select `Build Project` or `Build Project Clean` to build the project (output files are available in `build` folder).
 9. Select `Exit` to stop PyForge.
@@ -24,12 +29,12 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 - **root**: Full path to your C/C++ project root folder
 - **name**: Name of executable and library will be based on this
 - **version**: Defines the current project version. Format `{ "major": X, "minor": Y, "patch": Z }`
-- **product**: Project product type. Choose from the following
+- **product**: Project product type. Choose from the following:
     - **`app`**: Standalone application (`.exe`)
     - **`lib`**: Static library (`.a`)
     - **`dll`**: Shared library (`.dll`)
     - **`tmp`**: Template library (`.h` only)
-- **build**: Project build type. Choose from the following (`NOT IMPLEMENTED`)
+- **build**: Project build type. Choose from the following (`NOT IMPLEMENTED`):
     - **`debugg`**:
     - **`release`**:
     - **`min_release`**:
