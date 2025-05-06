@@ -1,7 +1,7 @@
 from rich.console import Console
 from rich.prompt import Prompt
+from rich.table import Table
 from typing import Callable
-import textwrap
 
 
 __all__ = ["OptionsMenu"]
@@ -9,42 +9,45 @@ __all__ = ["OptionsMenu"]
 
 class _Option:
     def __init__(
-            self: object,
+            self,
             label: str,
             action: Callable,
             *args
-            ):
-
+    ):
         self._label: str = label
         self._action: Callable = action
         self._action_args = args
 
     @property
-    def label(self: object) -> str:
+    def label(self) -> str:
         return self._label
 
-    def is_runnable(self: object) -> bool:
-        return self._action is not None
+    def empty(self) -> bool:
+        return self._action is None
 
-    def run(self: object) -> None:
-        if self.is_runnable():
+    def run(self) -> None:
+        if not self.empty():
             return self._action(*self._action_args)
 
 
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
 class OptionsMenu:
-    def __init__(self: object):
+    def __init__(self):
         self._header_text = "Main Menu"     # default header text
         self._count: int = 1
         self._options: dict[int, _Option] = {}
 
     def set_header_text(
-            self: object,
+            self,
             text: str
     ) -> None:
         self._header_text = text
 
     def add_option(
-            self: object,
+            self,
             label: str,
             action: Callable,
             *args
@@ -52,18 +55,19 @@ class OptionsMenu:
         self._options[self._count] = _Option(label, action, *args)
         self._count += 1
 
-    def run(self: object) -> None:
+    def run(self) -> None:
         MAIN_CONSOLE = Console()
-        menu_text = self._build_menu_text()
+        MENU_TABLE = self._build_menu_table()
 
         while True:
-            MAIN_CONSOLE.print(menu_text)
+            MAIN_CONSOLE.clear()
+            MAIN_CONSOLE.print(MENU_TABLE)
 
             choice_index = int(Prompt.ask("Please enter your choice", choices=[str(i) for i in range(1, self._count)]))
             selected_option = self._options[choice_index]
 
             # no function available at option (exit program)
-            if not selected_option.is_runnable():
+            if selected_option.empty():
                 MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
                 return
 
@@ -76,18 +80,21 @@ class OptionsMenu:
             else:
                 MAIN_CONSOLE.print("Operation successful!", style="green")
 
-    def _build_menu_text(self: object) -> str:
-        header = textwrap.dedent(
-        f'''
-        ===============================================
-        {self._header_text}
-        ===============================================
-        Select an option:
-        '''
+            Prompt.ask("\nPress Enter to continue", default="", show_default=False)
+
+    def _build_menu_table(self) -> Table:
+        table = Table(
+            title=self._header_text,
+            title_style="bold magenta",
+            title_justify="center",
+            show_edge=True,
+            pad_edge=True
         )
 
-        body = ""
-        for key, option in self._options.items():
-            body += f"{key}. {option.label}\n"
+        table.add_column("Option", justify="center", style="cyan", header_style="bold white")
+        table.add_column("Description", justify="left", style="white", header_style="bold green")
 
-        return f"{header}\n{body}"
+        for key, option in self._options.items():
+            table.add_row(str(key), option.label)
+
+        return table

@@ -1,15 +1,15 @@
-from enum import Enum
+from enum import Enum, auto
 
 from . import devfiles
 from .cmd import    CMDBuilder,\
-                    CMakeGeneratorFlag,\
-                    CMakeBuildType
+                    BuildType
 from .generator import  GeneratorBuilder,\
                         CMakeLibraryType,\
                         CMakeTargetVisibility
 
 
 __all__ = ["ProductType",
+           "BuildType",
            "generate",
            "build"
            ]
@@ -19,10 +19,10 @@ _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
 
 
 class ProductType(Enum):
-    APP = "app"
-    LIB = "lib"
-    DLL = "dll"
-    TMP = "tmp"
+    APP = auto()
+    LIB = auto()
+    DLL = auto()
+    TMP = auto()
 
 
 def generate(
@@ -167,22 +167,27 @@ def generate(
 
 def build(
         project_root_path: str,
-        c_compiler_path: str=None,
-        cpp_compiler_path: str=None,
-        clean: bool=False
+        project_build_type: BuildType,
+        c_compiler_path: str,
+        cpp_compiler_path: str,
+        cmake_bin_path: str,
+        buildsystem_bin_path: str,
+        clean: bool=True
 ) -> None:
     build_dir_path = devfiles.get_build_dir_path(project_root_path)
 
-    builder = CMDBuilder()
+    builder = CMDBuilder(cmake_bin_path, buildsystem_bin_path)
+
+    if clean:
+        builder.add_cmake_build_clear_part(build_dir_path)
 
     builder.add_cmake_generate_part(project_root_path,
-                                    CMakeGeneratorFlag.NINJA,
-                                    CMakeBuildType.RELEASE,
+                                    project_build_type,
                                     build_dir_path,
                                     c_compiler_path,
                                     cpp_compiler_path
                                     )
 
-    builder.add_cmake_build_part(build_dir_path, clean)
+    builder.add_cmake_build_part(build_dir_path)
 
     builder.cmd_product.run()

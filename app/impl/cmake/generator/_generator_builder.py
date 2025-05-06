@@ -18,17 +18,17 @@ __all__ = ["GeneratorBuilder",
 
 
 class GeneratorBuilder:
-    def __init__(self: object):
+    def __init__(self):
         self.reset_generator_product()
 
     @property
-    def generator_product(self: object) -> Generator:
+    def generator_product(self) -> Generator:
         return self._generator
 
-    def reset_generator_product(self: object) -> None:
+    def reset_generator_product(self) -> None:
         self._generator = Generator()
 
-    def add_header(self: object,
+    def add_header(self,
                    cmake_minimum_required_version: str,
                    project_name: str,
                    project_version: str,
@@ -51,7 +51,7 @@ class GeneratorBuilder:
                                     )
         self._generator.add_part(part)
 
-    def add_library(self: object,
+    def add_library(self,
                     name: str,
                     type: CMakeLibraryType,
     ) -> str:
@@ -59,7 +59,7 @@ class GeneratorBuilder:
         self._generator.add_part(part)
         return part.cmake_variable_name
 
-    def add_executable(self: object,
+    def add_executable(self,
                        name: str,
                        executable_file: str,
     ) -> str:
@@ -67,7 +67,7 @@ class GeneratorBuilder:
         self._generator.add_part(part)
         return part.cmake_variable_name
 
-    def add_target_include_directories(self: object,
+    def add_target_include_directories(self,
                                        cmake_target_var_name: str,
                                        visibility: CMakeTargetVisibility,
                                        include_directories: list[str]
@@ -75,7 +75,7 @@ class GeneratorBuilder:
         part = IncludeGeneratorPart(cmake_target_var_name, visibility, include_directories)
         self._generator.add_part(part)
 
-    def add_target_sources(self: object,
+    def add_target_sources(self,
                            cmake_target_var_name: str,
                            visibility: CMakeTargetVisibility,
                            source_files: list[str],
@@ -83,7 +83,7 @@ class GeneratorBuilder:
         part = SourceGeneratorPart(cmake_target_var_name, visibility, source_files)
         self._generator.add_part(part)
 
-    def add_target_compile_definitions(self: object,
+    def add_target_compile_definitions(self,
                                        cmake_target_var_name: str,
                                        visibility: CMakeTargetVisibility,
                                        compile_definitions: list[tuple[str, str]]
@@ -91,7 +91,7 @@ class GeneratorBuilder:
         part = DefinitionGeneratorPart(cmake_target_var_name, visibility, compile_definitions)
         self._generator.add_part(part)
 
-    def add_target_linker(self: object,
+    def add_target_linker(self,
                           cmake_target_var_name: str,
                           visibility: CMakeTargetVisibility,
                           *cmake_other_var_names
@@ -99,7 +99,7 @@ class GeneratorBuilder:
         part = LinkerGeneratorPart(cmake_target_var_name, visibility, *cmake_other_var_names)
         self._generator.add_part(part)
 
-    def add_googletest_library(self: object,
+    def add_googletest_library(self,
                                git_tag: str="main"
     ) -> tuple[str, str]:
         part = GoogleTestLibraryGeneratorPart(git_tag)
