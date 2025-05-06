@@ -61,6 +61,7 @@ class HeaderGeneratorPart(IGeneratorPart):
 
     def _write_cmake_minimum_required_version(self, file) -> None:
         file.write( f"cmake_minimum_required(VERSION {self._cmake_minimum_required_version} FATAL_ERROR)\n\n")
+        file.write( f"include(FetchContent)\n\n")
 
     def _write_project_specifications(self, file) -> None:
         file.write( f"project({self._project_name} "
@@ -109,7 +110,6 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
         self._write_gtest_gmock_cmake_variables(file)
 
     def _write_gtest_header(self, file) -> None:
-        file.write( f"include(FetchContent)\n")
         file.write( f"FetchContent_Declare(\n"
                     f"googletest\n"
                     f"GIT_REPOSITORY https://github.com/google/googletest.git\n"
@@ -125,6 +125,39 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
         file.write( f"set({self.gtest_cmake_variable_name} gtest)\n"
                     f"set({self.gmock_cmake_variable_name} gmock)\n\n"
                     )
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
+class UnityLibraryGeneratorPart(IGeneratorPart):
+    def __init__(
+            self,
+            git_tag: str
+    ):
+        self._git_tag = git_tag
+
+    @property
+    def unity_cmake_variable_name(self) -> str:
+        return "UNITY_CMAKE_LIB_NAME"
+
+    def run(self, file) -> None:
+        self._write_unity_header(file)
+        self._write_unity_cmake_variable(file)
+
+    def _write_unity_header(self, file) -> None:
+        file.write( f"FetchContent_Declare(\n"
+                    f"Unity\n"
+                    f"GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git\n"
+                    f"GIT_TAG {self._git_tag}\n"
+                    )
+        file.write( f")\n\n")
+
+        file.write(f"FetchContent_MakeAvailable(Unity)\n\n")
+
+    def _write_unity_cmake_variable(self, file) -> None:
+        file.write( f"set({self.unity_cmake_variable_name} Unity)\n\n")
 
 
 # ==========================================================================================================================

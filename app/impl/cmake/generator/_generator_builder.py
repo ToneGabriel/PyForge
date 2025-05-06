@@ -7,8 +7,9 @@ from ._generator_parts import   CMakeTargetVisibility,\
                                 IncludeGeneratorPart,\
                                 SourceGeneratorPart,\
                                 DefinitionGeneratorPart,\
+                                LinkerGeneratorPart,\
                                 GoogleTestLibraryGeneratorPart,\
-                                LinkerGeneratorPart
+                                UnityLibraryGeneratorPart
 
 
 __all__ = ["GeneratorBuilder",
@@ -105,3 +106,10 @@ class GeneratorBuilder:
         part = GoogleTestLibraryGeneratorPart(git_tag)
         self._generator.add_part(part)
         return [part.gtest_cmake_variable_name, part.gmock_cmake_variable_name]
+
+    def add_unity_library(self,
+                          git_tag: str="master"
+    ) -> str:
+        part = UnityLibraryGeneratorPart(git_tag)
+        self._generator.add_part(part)
+        return part.unity_cmake_variable_name
