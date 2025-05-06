@@ -7,7 +7,7 @@ __all__ = ["JSONStructureError", "load"]
 class JSONStructureError(Exception):
     """Exception raised for invalid json file structure"""
 
-    def __init__(self: object, message: str):
+    def __init__(self, message: str):
         super().__init__(message)
 
 

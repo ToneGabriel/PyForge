@@ -2,37 +2,33 @@ from ._cmd_base import CMDList
 from ._cmd_parts import CMakeGeneratePart,\
                         CMakeBuildPart,\
                         CMakeBuildClearPart,\
-                        CMakeBuildType,\
-                        CMakeGeneratorFlag
+                        BuildType
 
 
 __all__ = ["CMDBuilder",
-           "CMakeBuildType",
-           "CMakeGeneratorFlag"
+           "BuildType"
            ]
 
 
 class CMDBuilder:
-    def __init__(self: object, *env_paths: str):
+    def __init__(self, *env_paths: str):
         self.reset_cmd_product(*env_paths)
 
     @property
-    def cmd_product(self: object) -> CMDList:
+    def cmd_product(self) -> CMDList:
         return self._cmd_list
 
-    def reset_cmd_product(self: object, *env_paths: str) -> None:
+    def reset_cmd_product(self, *env_paths: str) -> None:
         self._cmd_list = CMDList(*env_paths)
 
-    def add_cmake_generate_part(self: object,
+    def add_cmake_generate_part(self,
                                 cmakelists_root_dir_path: str,
-                                cmake_generator_flag: CMakeGeneratorFlag,
-                                build_type: CMakeBuildType,
+                                build_type: BuildType,
                                 build_dir_path: str,
                                 c_compiler_path: str,
                                 cpp_compiler_path: str
     ) -> None:
         part = CMakeGeneratePart(cmakelists_root_dir_path,
-                                 cmake_generator_flag,
                                  build_type,
                                  build_dir_path,
                                  c_compiler_path,
@@ -40,13 +36,13 @@ class CMDBuilder:
                                  )
         self._cmd_list.add_part(part)
 
-    def add_cmake_build_part(self: object,
+    def add_cmake_build_part(self,
                              build_dir_path: str
     ) -> None:
         part = CMakeBuildPart(build_dir_path)
         self._cmd_list.add_part(part)
 
-    def add_cmake_build_clear_part(self: object,
+    def add_cmake_build_clear_part(self,
                                    build_dir_path: str
     ) -> None:
         part = CMakeBuildClearPart(build_dir_path)

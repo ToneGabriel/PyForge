@@ -9,8 +9,8 @@
             "minor": 0,
             "patch": 0
         },
-        "product": "app",
-        "build": "_NOT_IMPLEMENTED",
+        "product": "APP",
+        "build": "DEBUGG",
         "compile_definitions":
         [
             ["DEF_EXAMPLE", ""],
