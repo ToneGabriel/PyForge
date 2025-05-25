@@ -30,12 +30,16 @@ def generate(
         project_name: str,
         project_product_type: ProductType,
         project_version: str,
+        c_language_enabled: bool,
         c_language_standard: int,
         c_language_standard_required: bool,
         c_compiler_extensions_required: bool,
+        unity_framework_enabled: bool,
+        cpp_language_enabled: bool,
         cpp_language_standard: int,
         cpp_language_standard_required: bool,
         cpp_compiler_extensions_required: bool,
+        googletest_framework_enabled: bool,
         cmake_compile_definitions: list[tuple[str, str]]
 ) -> None:
         cmakelists_path = devfiles.get_cmakelists_file_path(project_root_path)
@@ -53,9 +57,11 @@ def generate(
         builder.add_header(_CMAKE_MINIMUM_REQUIRED_VERSION,
                            project_name,
                            project_version,
+                           c_language_enabled,
                            c_language_standard,
                            c_language_standard_required,
                            c_compiler_extensions_required,
+                           cpp_language_enabled,
                            cpp_language_standard,
                            cpp_language_standard_required,
                            cpp_compiler_extensions_required
@@ -132,34 +138,64 @@ def generate(
             case _:
                 raise RuntimeError(f"Invalid project build type: {project_product_type}.")
 
-        # Googletest (gtest and gmock)
-        gtest_lib_name, gmock_lib_name = builder.add_googletest_library()
+        if unity_framework_enabled:
+            # Unity
+            unity_lib_name = builder.add_unity_library()
 
-        # Test executable
-        test_executable_name = builder.add_executable("test_" + project_name,
-                                                      test_executable_file
-                                                      )
+            # Test executable
+            unity_executable_name = builder.add_executable("utest_" + project_name,
+                                                           test_executable_file
+                                                           )
+            
+            builder.add_target_linker(  unity_executable_name,
+                                        CMakeTargetVisibility.PRIVATE,
+                                        unity_lib_name
+                                        )
 
-        builder.add_target_linker(test_executable_name,
-                                  CMakeTargetVisibility.PRIVATE,
-                                  gtest_lib_name,
-                                  gmock_lib_name
-                                  )
+            builder.add_target_compile_definitions( unity_executable_name,
+                                                    CMakeTargetVisibility.PRIVATE,
+                                                    cmake_compile_definitions
+                                                    )
 
-        builder.add_target_compile_definitions(test_executable_name,
-                                               CMakeTargetVisibility.PRIVATE,
-                                               cmake_compile_definitions
-                                               )
+            builder.add_target_include_directories( unity_executable_name,
+                                                    CMakeTargetVisibility.PRIVATE,
+                                                    include_directories
+                                                    )
 
-        builder.add_target_include_directories(test_executable_name,
-                                               CMakeTargetVisibility.PRIVATE,
-                                               include_directories
-                                               )
+            builder.add_target_sources( unity_executable_name,
+                                        CMakeTargetVisibility.PRIVATE,
+                                        source_files + test_source_files
+                                        )
 
-        builder.add_target_sources(test_executable_name,
-                                   CMakeTargetVisibility.PRIVATE,
-                                   source_files + test_source_files
-                                   )
+        if googletest_framework_enabled:
+            # Googletest (gtest and gmock)
+            gtest_lib_name, gmock_lib_name = builder.add_googletest_library()
+
+            # Test executable
+            gtest_executable_name = builder.add_executable("gtest_" + project_name,
+                                                            test_executable_file
+                                                            )
+
+            builder.add_target_linker(  gtest_executable_name,
+                                        CMakeTargetVisibility.PRIVATE,
+                                        gtest_lib_name,
+                                        gmock_lib_name
+                                        )
+
+            builder.add_target_compile_definitions( gtest_executable_name,
+                                                    CMakeTargetVisibility.PRIVATE,
+                                                    cmake_compile_definitions
+                                                    )
+
+            builder.add_target_include_directories( gtest_executable_name,
+                                                    CMakeTargetVisibility.PRIVATE,
+                                                    include_directories
+                                                    )
+
+            builder.add_target_sources( gtest_executable_name,
+                                        CMakeTargetVisibility.PRIVATE,
+                                        source_files + test_source_files
+                                        )
 
         with open(cmakelists_path, "w") as cmakelists_root_open_file:
             builder.generator_product.run(cmakelists_root_open_file)

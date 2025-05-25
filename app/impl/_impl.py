@@ -24,18 +24,22 @@ _EXPECTED_JSON_STRUCTURE = {
 
     "c_settings":
     {
+        "language_enabled": bool,
         "compiler_path": str,
         "compiler_extensions_required": bool,
         "language_standard": int,
-        "language_standard_required": bool
+        "language_standard_required": bool,
+        "unity_framework_enabled": bool
     },
 
     "cpp_settings":
     {
+        "language_enabled": bool,
         "compiler_path": str,
         "compiler_extensions_required": bool,
         "language_standard": int,
-        "language_standard_required": bool
+        "language_standard_required": bool,
+        "googletest_framework_enabled": bool
     }
 }   # END _EXPECTED_JSON_STRUCTURE
 
@@ -78,6 +82,10 @@ class _Dataset:
         return self._json_data["project_settings"]["compile_definitions"]
 
     @property
+    def c_language_enabled(self) -> bool:
+        return self._json_data["c_settings"]["language_enabled"]
+
+    @property
     def c_compiler_path(self) -> str:
         return self._json_data["c_settings"]["compiler_path"]
 
@@ -94,6 +102,14 @@ class _Dataset:
         return self._json_data["c_settings"]["language_standard_required"]
 
     @property
+    def unity_framework_enabled(self) -> bool:
+        return self._json_data["c_settings"]["unity_framework_enabled"]
+
+    @property
+    def cpp_language_enabled(self) -> bool:
+        return self._json_data["cpp_settings"]["language_enabled"]
+
+    @property
     def cpp_compiler_path(self) -> str:
         return self._json_data["cpp_settings"]["compiler_path"]
 
@@ -108,6 +124,10 @@ class _Dataset:
     @property
     def cpp_language_standard_required(self) -> bool:
         return self._json_data["cpp_settings"]["language_standard_required"]
+
+    @property
+    def googletest_framework_enabled(self) -> bool:
+        return self._json_data["cpp_settings"]["googletest_framework_enabled"]
 
 
 # ==========================================================================================================================
@@ -160,12 +180,16 @@ class ImplementationSharedState:
                         project_name=self._dataset.project_name,
                         project_product_type=self._dataset.project_product_type,
                         project_version=self._dataset.project_version,
+                        c_language_enabled=self._dataset.c_language_enabled,
                         c_language_standard=self._dataset.c_language_standard,
                         c_language_standard_required=self._dataset.c_language_standard_required,
                         c_compiler_extensions_required=self._dataset.c_compiler_extensions_required,
+                        unity_framework_enabled=self._dataset.unity_framework_enabled,
+                        cpp_language_enabled=self._dataset.cpp_language_enabled,
                         cpp_language_standard=self._dataset.cpp_language_standard,
                         cpp_language_standard_required=self._dataset.cpp_language_standard_required,
                         cpp_compiler_extensions_required=self._dataset.cpp_compiler_extensions_required,
+                        googletest_framework_enabled=self._dataset.googletest_framework_enabled,
                         cmake_compile_definitions=self._dataset.cmake_compile_definitions
         )
 

@@ -21,17 +21,21 @@
 
     "c_settings":
     {
-        "compiler_path": "path\\to\\your\\c\\compiler\\exe",
+        "language_enabled": false,
+        "compiler_path": "leave_empty_or_path\\to\\your\\c\\compiler\\exe",
         "compiler_extensions_required": false,
         "language_standard": 17,
-        "language_standard_required": true
+        "language_standard_required": true,
+        "unity_framework_enabled": false
     },
 
     "cpp_settings":
     {
-        "compiler_path": "path\\to\\your\\cpp\\compiler\\exe",
+        "language_enabled": false,
+        "compiler_path": "leave_empty_or_path\\to\\your\\cpp\\compiler\\exe",
         "compiler_extensions_required": false,
         "language_standard": 20,
-        "language_standard_required": true
+        "language_standard_required": true,
+        "googletest_framework_enabled": false
     }
 }

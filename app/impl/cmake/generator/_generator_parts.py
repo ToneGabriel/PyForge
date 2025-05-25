@@ -36,9 +36,11 @@ class HeaderGeneratorPart(IGeneratorPart):
             cmake_minimum_required_version: str,
             project_name: str,
             project_version: str,
+            c_language_enabled: bool,
             c_language_standard: int,
             c_language_standard_required: bool,
             c_compiler_extensions_required: bool,
+            cpp_language_enabled: bool,
             cpp_language_standard: int,
             cpp_language_standard_required: bool,
             cpp_compiler_extensions_required: bool
@@ -46,9 +48,11 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._cmake_minimum_required_version = cmake_minimum_required_version
         self._project_name = project_name
         self._project_version = project_version
+        self._c_language_enabled = c_language_enabled
         self._c_language_standard = c_language_standard
         self._c_language_standard_required = c_language_standard_required
         self._c_compiler_extensions_required = c_compiler_extensions_required
+        self._cpp_language_enabled = cpp_language_enabled
         self._cpp_language_standard = cpp_language_standard
         self._cpp_language_standard_required = cpp_language_standard_required
         self._cpp_compiler_extensions_required = cpp_compiler_extensions_required
@@ -64,20 +68,30 @@ class HeaderGeneratorPart(IGeneratorPart):
         file.write( f"include(FetchContent)\n\n")
 
     def _write_project_specifications(self, file) -> None:
+        languages = ""
+        if self._c_language_enabled:
+            languages += " C"
+        
+        if self._cpp_language_enabled:
+            languages += "CXX"
+
         file.write( f"project({self._project_name} "
                     f"VERSION {self._project_version} "
-                    f"LANGUAGES C CXX)\n\n"
+                    f"LANGUAGES{languages})\n\n"
                     )
 
     def _write_language_specifications(self, file) -> None:
-        file.write( f"set(CMAKE_C_STANDARD {self._c_language_standard})\n"
-                    f"set(CMAKE_C_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._c_language_standard_required)})\n"
-                    f"set(CMAKE_C_EXTENSIONS {_adapt_to_cmake_bool(self._c_compiler_extensions_required)})\n\n"
+        if self._c_language_enabled:
+            file.write( f"set(CMAKE_C_STANDARD {self._c_language_standard})\n"
+                        f"set(CMAKE_C_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._c_language_standard_required)})\n"
+                        f"set(CMAKE_C_EXTENSIONS {_adapt_to_cmake_bool(self._c_compiler_extensions_required)})\n\n"
+                        )
 
-                    f"set(CMAKE_CXX_STANDARD {self._cpp_language_standard})\n"
-                    f"set(CMAKE_CXX_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._cpp_language_standard_required)})\n"
-                    f"set(CMAKE_CXX_EXTENSIONS {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n\n"
-                    )
+        if self._cpp_language_enabled:
+            file.write( f"set(CMAKE_CXX_STANDARD {self._cpp_language_standard})\n"
+                        f"set(CMAKE_CXX_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._cpp_language_standard_required)})\n"
+                        f"set(CMAKE_CXX_EXTENSIONS {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n\n"
+                        )
 
     def _write_destination_specifications(self, file) -> None:
         file.write( f"set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/bin)\n"

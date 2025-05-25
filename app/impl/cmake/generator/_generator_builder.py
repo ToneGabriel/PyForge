@@ -33,9 +33,11 @@ class GeneratorBuilder:
                    cmake_minimum_required_version: str,
                    project_name: str,
                    project_version: str,
+                   c_language_enabled: bool,
                    c_language_standard: int,
                    c_language_standard_required: bool,
                    c_compiler_extensions_required: bool,
+                   cpp_language_enabled: bool,
                    cpp_language_standard: int,
                    cpp_language_standard_required: bool,
                    cpp_compiler_extensions_required: bool
@@ -43,9 +45,11 @@ class GeneratorBuilder:
         part = HeaderGeneratorPart(cmake_minimum_required_version,
                                     project_name,
                                     project_version,
+                                    c_language_enabled,
                                     c_language_standard,
                                     c_language_standard_required,
                                     c_compiler_extensions_required,
+                                    cpp_language_enabled,
                                     cpp_language_standard,
                                     cpp_language_standard_required,
                                     cpp_compiler_extensions_required
