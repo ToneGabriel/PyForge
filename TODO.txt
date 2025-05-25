@@ -1,0 +1,2 @@
+1. structure.zip was changed to handle test_c and test_cpp
+2. change code so that it splits the c and cpp files when linking to tests
