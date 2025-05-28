@@ -73,7 +73,7 @@ class HeaderGeneratorPart(IGeneratorPart):
             languages += " C"
         
         if self._cpp_language_enabled:
-            languages += "CXX"
+            languages += " CXX"
 
         file.write( f"project({self._project_name} "
                     f"VERSION {self._project_version} "
