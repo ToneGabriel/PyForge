@@ -17,29 +17,21 @@ _EXPECTED_JSON_STRUCTURE = {
             "minor": int,
             "patch": int
         },
+        "include_dir_name": str,
+        "source_dir_name": str,
+
+        "language": str,
         "product": str,
         "build": str,
         "compile_definitions": list
     },
 
-    "c_settings":
+    "compiler_settings":
     {
-        "language_enabled": bool,
         "compiler_path": str,
         "compiler_extensions_required": bool,
         "language_standard": int,
-        "language_standard_required": bool,
-        "unity_framework_enabled": bool
-    },
-
-    "cpp_settings":
-    {
-        "language_enabled": bool,
-        "compiler_path": str,
-        "compiler_extensions_required": bool,
-        "language_standard": int,
-        "language_standard_required": bool,
-        "googletest_framework_enabled": bool
+        "language_standard_required": bool
     }
 }   # END _EXPECTED_JSON_STRUCTURE
 
@@ -68,6 +60,19 @@ class _Dataset:
                 )
 
     @property
+    def include_dir_name(self) -> str:
+        return self._json_data["project_settings"]["include_dir_name"]
+
+    @property
+    def source_dir_name(self) -> str:
+        return self._json_data["project_settings"]["source_dir_name"]
+
+    @property
+    def project_language(self) -> cmake.Language:
+        # [] for match by enum name
+        return cmake.Language[self._json_data["project_settings"]["language"]]
+
+    @property
     def project_product_type(self) -> cmake.ProductType:
         # [] for match by enum name
         return cmake.ProductType[self._json_data["project_settings"]["product"]]
@@ -82,52 +87,20 @@ class _Dataset:
         return self._json_data["project_settings"]["compile_definitions"]
 
     @property
-    def c_language_enabled(self) -> bool:
-        return self._json_data["c_settings"]["language_enabled"]
+    def compiler_path(self) -> str:
+        return self._json_data["compiler_settings"]["compiler_path"]
 
     @property
-    def c_compiler_path(self) -> str:
-        return self._json_data["c_settings"]["compiler_path"]
+    def compiler_extensions_required(self) -> bool:
+        return self._json_data["compiler_settings"]["compiler_extensions_required"]
 
     @property
-    def c_compiler_extensions_required(self) -> bool:
-        return self._json_data["c_settings"]["compiler_extensions_required"]
+    def language_standard(self) -> int:
+        return self._json_data["compiler_settings"]["language_standard"]
 
     @property
-    def c_language_standard(self) -> int:
-        return self._json_data["c_settings"]["language_standard"]
-
-    @property
-    def c_language_standard_required(self) -> bool:
-        return self._json_data["c_settings"]["language_standard_required"]
-
-    @property
-    def unity_framework_enabled(self) -> bool:
-        return self._json_data["c_settings"]["unity_framework_enabled"]
-
-    @property
-    def cpp_language_enabled(self) -> bool:
-        return self._json_data["cpp_settings"]["language_enabled"]
-
-    @property
-    def cpp_compiler_path(self) -> str:
-        return self._json_data["cpp_settings"]["compiler_path"]
-
-    @property
-    def cpp_compiler_extensions_required(self) -> bool:
-        return self._json_data["cpp_settings"]["compiler_extensions_required"]
-
-    @property
-    def cpp_language_standard(self) -> int:
-        return self._json_data["cpp_settings"]["language_standard"]
-
-    @property
-    def cpp_language_standard_required(self) -> bool:
-        return self._json_data["cpp_settings"]["language_standard_required"]
-
-    @property
-    def googletest_framework_enabled(self) -> bool:
-        return self._json_data["cpp_settings"]["googletest_framework_enabled"]
+    def language_standard_required(self) -> bool:
+        return self._json_data["compiler_settings"]["language_standard_required"]
 
 
 # ==========================================================================================================================
@@ -145,19 +118,19 @@ class ImplementationSharedState:
     def __init__(self):
         self._json_path = None
         self._cmake_bin_path = None
-        self._buildsystem_bin_path = None
+        self._ninja_bin_path = None
         self._zip_structure_path = None
         self._dataset = None
 
     def initialize(self,
                    json_path: str,
                    cmake_bin_path: str,
-                   buildsystem_bin_path: str,
+                   ninja_bin_path: str,
                    zip_structure_path: str
     ) -> None:
         self._json_path = json_path
         self._cmake_bin_path = cmake_bin_path
-        self._buildsystem_bin_path = buildsystem_bin_path
+        self._ninja_bin_path = ninja_bin_path
         self._zip_structure_path = zip_structure_path
         self.reload()
 
@@ -180,16 +153,10 @@ class ImplementationSharedState:
                         project_name=self._dataset.project_name,
                         project_product_type=self._dataset.project_product_type,
                         project_version=self._dataset.project_version,
-                        c_language_enabled=self._dataset.c_language_enabled,
-                        c_language_standard=self._dataset.c_language_standard,
-                        c_language_standard_required=self._dataset.c_language_standard_required,
-                        c_compiler_extensions_required=self._dataset.c_compiler_extensions_required,
-                        unity_framework_enabled=self._dataset.unity_framework_enabled,
-                        cpp_language_enabled=self._dataset.cpp_language_enabled,
-                        cpp_language_standard=self._dataset.cpp_language_standard,
-                        cpp_language_standard_required=self._dataset.cpp_language_standard_required,
-                        cpp_compiler_extensions_required=self._dataset.cpp_compiler_extensions_required,
-                        googletest_framework_enabled=self._dataset.googletest_framework_enabled,
+                        project_language=self._dataset.project_language,
+                        language_standard=self._dataset.language_standard,
+                        language_standard_required=self._dataset.language_standard_required,
+                        compiler_extensions_required=self._dataset.compiler_extensions_required,
                         cmake_compile_definitions=self._dataset.cmake_compile_definitions
         )
 
@@ -197,10 +164,10 @@ class ImplementationSharedState:
         self._check_initialization()
         cmake.build(project_root_path=self._dataset.project_root_path,
                     project_build_type=self._dataset.project_build_type,
-                    c_compiler_path=self._dataset.c_compiler_path,
-                    cpp_compiler_path=self._dataset.cpp_compiler_path,
+                    c_compiler_path=self._dataset.compiler_path,
+                    cpp_compiler_path=self._dataset.compiler_path,
                     cmake_bin_path=self._cmake_bin_path,
-                    buildsystem_bin_path=self._buildsystem_bin_path,
+                    ninja_bin_path=self._ninja_bin_path,
                     clean=clean
         )
 

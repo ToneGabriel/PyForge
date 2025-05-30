@@ -9,6 +9,10 @@
             "minor": 0,
             "patch": 0
         },
+        "include_dir_name": "include",
+        "source_dir_name": "source",
+
+        "language": "C",
         "product": "APP",
         "build": "DEBUGG",
         "compile_definitions":
@@ -19,23 +23,11 @@
         ]
     },
 
-    "c_settings":
+    "compiler_settings":
     {
-        "language_enabled": false,
-        "compiler_path": "leave_empty_or_path\\to\\your\\c\\compiler\\exe",
+        "compiler_path": "leave_empty_or_path\\to\\your\\c_cpp\\compiler\\exe",
         "compiler_extensions_required": false,
         "language_standard": 17,
-        "language_standard_required": true,
-        "unity_framework_enabled": false
-    },
-
-    "cpp_settings":
-    {
-        "language_enabled": false,
-        "compiler_path": "leave_empty_or_path\\to\\your\\cpp\\compiler\\exe",
-        "compiler_extensions_required": false,
-        "language_standard": 20,
-        "language_standard_required": true,
-        "googletest_framework_enabled": false
+        "language_standard_required": true
     }
 }
