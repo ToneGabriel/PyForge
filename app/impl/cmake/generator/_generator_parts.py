@@ -149,7 +149,8 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
         self._write_gtest_gmock_cmake_variables(file)
 
     def _write_gtest_header(self, file) -> None:
-        file.write( f"FetchContent_Declare(\n"
+        file.write( f"include(FetchContent)\n"
+                    f"FetchContent_Declare(\n"
                     f"googletest\n"
                     f"GIT_REPOSITORY https://github.com/google/googletest.git\n"
                     f"GIT_TAG {self._git_tag}\n"
@@ -187,7 +188,8 @@ class UnityLibraryGeneratorPart(IGeneratorPart):
         self._write_unity_cmake_variable(file)
 
     def _write_unity_header(self, file) -> None:
-        file.write( f"FetchContent_Declare(\n"
+        file.write( f"include(FetchContent)\n"
+                    f"FetchContent_Declare(\n"
                     f"Unity\n"
                     f"GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git\n"
                     f"GIT_TAG {self._git_tag}\n"
