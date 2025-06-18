@@ -17,7 +17,7 @@ _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
 
 
 class ProductType(Enum):
-    APP = auto()    # Standalone application (executable)
+    EXE = auto()    # Standalone application (executable)
     LIB = auto()    # Static library
     DLL = auto()    # Dynamic linked library
     TST = auto()    # Test executable (with googletest or unity)
@@ -51,7 +51,7 @@ def generate(
                            )
 
         match project_product_type:
-            case ProductType.APP:
+            case ProductType.EXE:
                 app_executable_cmake_variable_name = builder.add_executable(project_name,
                                                                             executable_file
                                                                             )
@@ -112,7 +112,7 @@ def generate(
                                                        )
 
             case ProductType.TST:
-                test_executable_cmake_variable_name = builder.add_executable("test_" + project_name,
+                test_executable_cmake_variable_name = builder.add_executable(project_name,
                                                                              executable_file
                                                                              )
 

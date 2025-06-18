@@ -13,7 +13,7 @@
         },
 
         "language": "C",
-        "product": "APP",
+        "product": "EXE",
         "build": "DEBUGG",
         "compile_definitions":
         [

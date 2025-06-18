@@ -28,7 +28,7 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 - **version**: Defines the current project version. Format `{ "major": X, "minor": Y, "patch": Z }`
 - **language**: Language used: `C` or `CPP`
 - **product**: Project product type. Choose from the following:
-    - **`APP`**: Standalone application (`.exe`)
+    - **`EXE`**: Standalone application (`.exe`)
     - **`LIB`**: Static library (`.a`)
     - **`DLL`**: Shared library (`.dll`)
     - **`TST`**: Test executable (`.exe`). Integrates `googletest` or `unity` based on language
