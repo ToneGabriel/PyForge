@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from ._generator_base import IGeneratorPart
+from ._generator_base import IGeneratorPart, override
 
 
 __all__ = ["CMakeLibraryType",
@@ -88,6 +88,7 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._language_standard_required = language_standard_required
         self._compiler_extensions_required = compiler_extensions_required
 
+    @override
     def run(self, file) -> None:
         self._write_cmake_minimum_required_version(file)
         self._write_project_specifications(file)
@@ -142,6 +143,7 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
     def gmock_cmake_variable_name(self) -> str:
         return "GMOCK_CMAKE_LIB_NAME"
 
+    @override
     def run(self, file) -> None:
         self._write_gtest_header(file)
         self._write_gtest_gmock_cmake_variables(file)
@@ -179,6 +181,7 @@ class UnityLibraryGeneratorPart(IGeneratorPart):
     def unity_cmake_variable_name(self) -> str:
         return "UNITY_CMAKE_LIB_NAME"
 
+    @override
     def run(self, file) -> None:
         self._write_unity_header(file)
         self._write_unity_cmake_variable(file)
@@ -214,6 +217,7 @@ class LibraryGeneratorPart(IGeneratorPart):
     def cmake_variable_name(self) -> str:
         return self._name.upper() + "_LIB_NAME"
 
+    @override
     def run(self, file) -> None:
         self._write_library_header(file)
 
@@ -240,6 +244,7 @@ class ExecutableGeneratorPart(IGeneratorPart):
     def cmake_variable_name(self) -> str:
         return self._name.upper() + "_EXE_NAME"
 
+    @override
     def run(self, file) -> None:
         self._write_executable_header(file)
 
@@ -263,6 +268,7 @@ class IncludeGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._include_directories = include_directories
 
+    @override
     def run(self, file):
         self._write_target_include_directories(file)
 
@@ -290,6 +296,7 @@ class SourceGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._source_files = source_files
 
+    @override
     def run(self, file):
         self._write_target_sources(file)
 
@@ -317,6 +324,7 @@ class DefinitionGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._compile_definitions = compile_definitions
 
+    @override
     def run(self, file):
         self._write_target_compile_definitions(file)
 
@@ -348,6 +356,7 @@ class LinkerGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._cmake_lib_var_names = cmake_lib_var_names
 
+    @override
     def run(self, file) -> None:
         self._write_target_link_libraries(file)
 

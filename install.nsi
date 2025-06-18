@@ -43,7 +43,7 @@ Section "Core Files" SEC01
 
   SetOutPath $INSTDIR
   File .\.pyinstaller.out\dist\pyforge.exe  ; created by pyinstaller
-  File .\input.json
+  File .\manifest.json
 SectionEnd
 
 Section "Readme" SEC02

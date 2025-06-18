@@ -1,5 +1,4 @@
 from . import jsonvalid
-from . import structure
 from . import cmake
 
 
@@ -10,6 +9,8 @@ _EXPECTED_JSON_STRUCTURE = {
     "project_settings":
     {
         "root": str,
+        "ignored": list,
+
         "name": str,
         "version":
         {
@@ -17,8 +18,6 @@ _EXPECTED_JSON_STRUCTURE = {
             "minor": int,
             "patch": int
         },
-        "include_dir_name": str,
-        "source_dir_name": str,
 
         "language": str,
         "product": str,
@@ -47,6 +46,10 @@ class _Dataset:
     @property
     def project_root_path(self) -> str:
         return self._json_data["project_settings"]["root"]
+
+    @property
+    def project_ignored_dir_names(self) -> list[str]:
+        return self._json_data["project_settings"]["ignored"]
 
     @property
     def project_name(self) -> str:
@@ -119,19 +122,16 @@ class ImplementationSharedState:
         self._json_path = None
         self._cmake_bin_path = None
         self._ninja_bin_path = None
-        self._zip_structure_path = None
         self._dataset = None
 
     def initialize(self,
                    json_path: str,
                    cmake_bin_path: str,
                    ninja_bin_path: str,
-                   zip_structure_path: str
     ) -> None:
         self._json_path = json_path
         self._cmake_bin_path = cmake_bin_path
         self._ninja_bin_path = ninja_bin_path
-        self._zip_structure_path = zip_structure_path
         self.reload()
 
     def is_initialized(self) -> bool:
@@ -141,15 +141,10 @@ class ImplementationSharedState:
         self._check_initialization()
         self._dataset = _Dataset(self._json_path)
 
-    def setup_project_structure(self) -> None:
-        self._check_initialization()
-        structure.setup_project(zip_structure_path=self._zip_structure_path,
-                                project_root_path=self._dataset.project_root_path
-        )
-
     def generate_cmakelists(self) -> None:
         self._check_initialization()
         cmake.generate( project_root_path=self._dataset.project_root_path,
+                        project_ignored_dir_names=self._dataset.project_ignored_dir_names,
                         project_name=self._dataset.project_name,
                         project_product_type=self._dataset.project_product_type,
                         project_version=self._dataset.project_version,

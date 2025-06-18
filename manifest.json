@@ -2,6 +2,8 @@
     "project_settings":
     {
         "root": "path\\to\\your\\project\\root\\folder",
+        "ignored": [".git", "build", "config"],
+
         "name": "your_project_name",
         "version":
         {
@@ -9,8 +11,6 @@
             "minor": 0,
             "patch": 0
         },
-        "include_dir_name": "include",
-        "source_dir_name": "source",
 
         "language": "C",
         "product": "APP",

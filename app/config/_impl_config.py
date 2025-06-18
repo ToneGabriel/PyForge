@@ -4,7 +4,6 @@ import sys
 
 __all__ = ["CMAKE_BIN_PATH",
            "NINJA_BIN_PATH",
-           "STRUCTURE_ZIP_PATH",
            "JSON_PATH"
            ]
 
@@ -23,5 +22,4 @@ _ENVIRONMENT_ROOT_PATH: str = os.path.dirname(_get_executable_path())
 
 CMAKE_BIN_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "deps", "cmake", "bin")
 NINJA_BIN_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "deps", "ninja", "bin")
-STRUCTURE_ZIP_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "deps", "structure.zip")
-JSON_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "input.json")
+JSON_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "manifest.json")
