@@ -20,7 +20,6 @@ class ProductType(Enum):
     EXE = auto()    # Standalone application (executable)
     LIB = auto()    # Static library
     DLL = auto()    # Dynamic linked library
-    TST = auto()    # Test executable (with googletest or unity)
 
 
 def generate(
@@ -50,104 +49,32 @@ def generate(
                            compiler_extensions_required
                            )
 
+        # declare target
+        cmake_target_var_name = None
+
+        # create target based on product type
         match project_product_type:
             case ProductType.EXE:
-                app_executable_cmake_variable_name = builder.add_executable(project_name,
-                                                                            executable_file
-                                                                            )
-
-                builder.add_target_include_directories(app_executable_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       include_directories
-                                                       )
-
-                builder.add_target_sources(app_executable_cmake_variable_name,
-                                           CMakeTargetVisibility.PRIVATE,
-                                           source_files
-                                           )
-
-                builder.add_target_compile_definitions(app_executable_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       cmake_compile_definitions
-                                                       )
+                cmake_target_var_name = builder.add_executable(project_name, executable_file)
 
             case ProductType.LIB:
-                static_lib_cmake_variable_name = builder.add_library(project_name,
-                                                                     CMakeLibraryType.STATIC
-                                                                     )
-
-                builder.add_target_include_directories(static_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PUBLIC,
-                                                       include_directories
-                                                       )
-
-                builder.add_target_sources(static_lib_cmake_variable_name,
-                                           CMakeTargetVisibility.PRIVATE,
-                                           source_files
-                                           )
-
-                builder.add_target_compile_definitions(static_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       cmake_compile_definitions
-                                                       )
+                cmake_target_var_name = builder.add_library(project_name, CMakeLibraryType.STATIC)
 
             case ProductType.DLL:
-                shared_lib_cmake_variable_name = builder.add_library(project_name,
-                                                                     CMakeLibraryType.SHARED
-                                                                     )
-
-                builder.add_target_include_directories(shared_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PUBLIC,
-                                                       include_directories
-                                                       )
-
-                builder.add_target_sources(shared_lib_cmake_variable_name,
-                                           CMakeTargetVisibility.PRIVATE,
-                                           source_files
-                                           )
-
-                builder.add_target_compile_definitions(shared_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       cmake_compile_definitions
-                                                       )
-
-            case ProductType.TST:
-                test_executable_cmake_variable_name = builder.add_executable(project_name,
-                                                                             executable_file
-                                                                             )
-
-                builder.add_target_include_directories(test_executable_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       include_directories
-                                                       )
-
-                builder.add_target_sources(test_executable_cmake_variable_name,
-                                           CMakeTargetVisibility.PRIVATE,
-                                           source_files
-                                           )
-
-                builder.add_target_compile_definitions(test_executable_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       cmake_compile_definitions
-                                                       )
-
-                if project_language == Language.CPP:
-                    gtest_lib_name, gmock_lib_name = builder.add_googletest_library()
-                    builder.add_target_linker(test_executable_cmake_variable_name,
-                                              CMakeTargetVisibility.PRIVATE,
-                                              gtest_lib_name,
-                                              gmock_lib_name
-                                              )
-                else:
-                    unity_lib_name = builder.add_unity_library()
-                    builder.add_target_linker(test_executable_cmake_variable_name,
-                                              CMakeTargetVisibility.PRIVATE,
-                                              unity_lib_name
-                                              )
+                cmake_target_var_name = builder.add_library(project_name, CMakeLibraryType.SHARED)
 
             case _:
                 raise RuntimeError(f"Project product type not implemented: {project_product_type}")
 
+        # add include, source and compile definitions to target
+        builder.add_target_include_directories(cmake_target_var_name, CMakeTargetVisibility.PUBLIC, include_directories)
+        builder.add_target_sources(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, source_files)
+        builder.add_target_compile_definitions(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, cmake_compile_definitions)
+
+        # link imported libraries
+        # TODO
+
+        # write ALL info in CMakelists.txt
         with open(cmakelists_path, "w") as cmakelists_root_open_file:
             builder.generator_product.run(cmakelists_root_open_file)
 

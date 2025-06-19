@@ -1,9 +1,26 @@
 {
+    "path_settings":
+    {
+        "root": "full\\path\\to\\your\\project\\root\\folder",
+        "ignore": [".git", "build", "config", "extern", "import"],
+        "import":
+        {
+            "static":
+            [
+                ["path\\to\\library1\\implementation\\.lib_.a", "path\\to\\library1\\include"],
+                ["path\\to\\library2\\implementation\\.lib_.a", "path\\to\\library2\\include"]
+            ],
+
+            "shared":
+            [
+                ["path\\to\\library1\\.dll", "path\\to\\library1\\implementation\\.lib_.a", "path\\to\\library1\\include"],
+                ["path\\to\\library2\\.dll", "path\\to\\library2\\implementation\\.lib_.a", "path\\to\\library2\\include"]
+            ]
+        }
+    },
+
     "project_settings":
     {
-        "root": "path\\to\\your\\project\\root\\folder",
-        "ignored": [".git", "build", "config"],
-
         "name": "your_project_name",
         "version":
         {

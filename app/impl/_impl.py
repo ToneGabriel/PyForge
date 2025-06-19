@@ -6,11 +6,19 @@ __all__ = ["ImplementationSharedState"]
 
 
 _EXPECTED_JSON_STRUCTURE = {
-    "project_settings":
+    "path_settings":
     {
         "root": str,
-        "ignored": list,
+        "ignore": list,
+        "import":
+        {
+            "static": list,
+            "shared": list
+        }
+    },
 
+    "project_settings":
+    {
         "name": str,
         "version":
         {
@@ -43,14 +51,24 @@ class _Dataset:
     def __init__(self, json_path: str):
         self._json_data = jsonvalid.load(json_path, _EXPECTED_JSON_STRUCTURE)
 
+# path_settings
     @property
     def project_root_path(self) -> str:
-        return self._json_data["project_settings"]["root"]
+        return self._json_data["path_settings"]["root"]
 
     @property
     def project_ignored_dir_names(self) -> list[str]:
-        return self._json_data["project_settings"]["ignored"]
+        return self._json_data["path_settings"]["ignore"]
 
+    @property
+    def project_imported_static_libs(self) -> list[tuple[str, str]]:
+        return self._json_data["path_settings"]["import"]["static"]
+
+    @property
+    def project_imported_shared_libs(self) -> list[tuple[str, str, str]]:
+        return self._json_data["path_settings"]["import"]["shared"]
+
+# project_settings
     @property
     def project_name(self) -> str:
         return self._json_data["project_settings"]["name"]
@@ -89,6 +107,7 @@ class _Dataset:
     def cmake_compile_definitions(self) -> list[tuple[str, str]]:
         return self._json_data["project_settings"]["compile_definitions"]
 
+# compiler_settings
     @property
     def compiler_path(self) -> str:
         return self._json_data["compiler_settings"]["compiler_path"]
