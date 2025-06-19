@@ -1,19 +1,11 @@
 from ._generator_base import Generator
-from ._generator_parts import   CMakeTargetVisibility,\
-                                CMakeLibraryType,\
-                                HeaderGeneratorPart,\
-                                LibraryGeneratorPart,\
-                                ExecutableGeneratorPart,\
-                                IncludeGeneratorPart,\
-                                SourceGeneratorPart,\
-                                DefinitionGeneratorPart,\
-                                GoogleTestLibraryGeneratorPart,\
-                                LinkerGeneratorPart
+from ._generator_parts import *
 
 
 __all__ = ["GeneratorBuilder",
            "CMakeLibraryType",
-           "CMakeTargetVisibility"
+           "CMakeTargetVisibility",
+           "Language"
            ]
 
 
@@ -32,23 +24,19 @@ class GeneratorBuilder:
                    cmake_minimum_required_version: str,
                    project_name: str,
                    project_version: str,
-                   c_language_standard: int,
-                   c_language_standard_required: bool,
-                   c_compiler_extensions_required: bool,
-                   cpp_language_standard: int,
-                   cpp_language_standard_required: bool,
-                   cpp_compiler_extensions_required: bool
+                   project_language: Language,
+                   language_standard: int,
+                   language_standard_required: bool,
+                   compiler_extensions_required: bool,
     ) -> None:
         part = HeaderGeneratorPart(cmake_minimum_required_version,
-                                    project_name,
-                                    project_version,
-                                    c_language_standard,
-                                    c_language_standard_required,
-                                    c_compiler_extensions_required,
-                                    cpp_language_standard,
-                                    cpp_language_standard_required,
-                                    cpp_compiler_extensions_required
-                                    )
+                                   project_name,
+                                   project_version,
+                                   project_language,
+                                   language_standard,
+                                   language_standard_required,
+                                   compiler_extensions_required
+                                   )
         self._generator.add_part(part)
 
     def add_library(self,
@@ -105,3 +93,10 @@ class GeneratorBuilder:
         part = GoogleTestLibraryGeneratorPart(git_tag)
         self._generator.add_part(part)
         return [part.gtest_cmake_variable_name, part.gmock_cmake_variable_name]
+
+    def add_unity_library(self,
+                          git_tag: str="master"
+    ) -> str:
+        part = UnityLibraryGeneratorPart(git_tag)
+        self._generator.add_part(part)
+        return part.unity_cmake_variable_name

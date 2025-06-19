@@ -1,0 +1,50 @@
+{
+    "path_settings":
+    {
+        "root": "full\\path\\to\\your\\project\\root\\folder",
+        "ignore": [".git", "build", "config", "extern", "import"],
+        "import":
+        {
+            "static":
+            [
+                ["path\\to\\library1\\implementation\\.lib_.a", "path\\to\\library1\\include"],
+                ["path\\to\\library2\\implementation\\.lib_.a", "path\\to\\library2\\include"]
+            ],
+
+            "shared":
+            [
+                ["path\\to\\library1\\.dll", "path\\to\\library1\\implementation\\.lib_.a", "path\\to\\library1\\include"],
+                ["path\\to\\library2\\.dll", "path\\to\\library2\\implementation\\.lib_.a", "path\\to\\library2\\include"]
+            ]
+        }
+    },
+
+    "project_settings":
+    {
+        "name": "your_project_name",
+        "version":
+        {
+            "major": 0,
+            "minor": 0,
+            "patch": 0
+        },
+
+        "language": "C",
+        "product": "EXE",
+        "build": "DEBUGG",
+        "compile_definitions":
+        [
+            ["DEF_EXAMPLE", ""],
+            ["DEF_VAL_EXAMPLE", "value"],
+            ["DEF_STR_EXAMPLE", "\"string\""]
+        ]
+    },
+
+    "compiler_settings":
+    {
+        "compiler_path": "leave_empty_or_path\\to\\your\\c_cpp\\compiler\\exe",
+        "compiler_extensions_required": false,
+        "language_standard": 17,
+        "language_standard_required": true
+    }
+}

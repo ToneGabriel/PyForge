@@ -1,5 +1,20 @@
-from enum import Enum
-from ._generator_base import IGeneratorPart
+from enum import Enum, auto
+from ._generator_base import IGeneratorPart, override
+
+
+__all__ = ["CMakeLibraryType",
+           "CMakeTargetVisibility",
+           "Language",
+           "HeaderGeneratorPart",
+           "LibraryGeneratorPart",
+           "ExecutableGeneratorPart",
+           "IncludeGeneratorPart",
+           "SourceGeneratorPart",
+           "DefinitionGeneratorPart",
+           "LinkerGeneratorPart",
+           "GoogleTestLibraryGeneratorPart",
+           "UnityLibraryGeneratorPart"
+           ]
 
 
 class CMakeLibraryType(Enum):
@@ -14,6 +29,11 @@ class CMakeTargetVisibility(Enum):
     INTERFACE = "INTERFACE"
 
 
+class Language(Enum):
+    C = "C"
+    CPP = "CXX"
+
+
 # ==========================================================================================================================
 # ==========================================================================================================================
 
@@ -26,6 +46,25 @@ def _adapt_to_cmake_path_separator(path: str) -> str:
     return path.replace("\\", "/")
 
 
+class _COMPILER_SETTINGS_NAMES(Enum):
+    LANGUAGE_STANDARD = auto()
+    LANGUAGE_STANDARD_REQUIRED = auto()
+    COMPILER_EXTENSION_REQUIRED = auto()
+
+
+_C_CMAKE_COMPILER_SETTINGS_NAMES = {
+    _COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD: "CMAKE_C_STANDARD",
+    _COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD_REQUIRED: "CMAKE_C_STANDARD_REQUIRED",
+    _COMPILER_SETTINGS_NAMES.COMPILER_EXTENSION_REQUIRED: "CMAKE_C_EXTENSIONS"
+}
+
+_CPP_CMAKE_COMPILER_SETTINGS_NAMES = {
+    _COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD: "CMAKE_CXX_STANDARD",
+    _COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD_REQUIRED: "CMAKE_CXX_STANDARD_REQUIRED",
+    _COMPILER_SETTINGS_NAMES.COMPILER_EXTENSION_REQUIRED: "CMAKE_CXX_EXTENSIONS"
+}
+
+
 # ==========================================================================================================================
 # ==========================================================================================================================
 
@@ -36,23 +75,20 @@ class HeaderGeneratorPart(IGeneratorPart):
             cmake_minimum_required_version: str,
             project_name: str,
             project_version: str,
-            c_language_standard: int,
-            c_language_standard_required: bool,
-            c_compiler_extensions_required: bool,
-            cpp_language_standard: int,
-            cpp_language_standard_required: bool,
-            cpp_compiler_extensions_required: bool
+            project_language: Language,
+            language_standard: int,
+            language_standard_required: bool,
+            compiler_extensions_required: bool
     ):
         self._cmake_minimum_required_version = cmake_minimum_required_version
         self._project_name = project_name
         self._project_version = project_version
-        self._c_language_standard = c_language_standard
-        self._c_language_standard_required = c_language_standard_required
-        self._c_compiler_extensions_required = c_compiler_extensions_required
-        self._cpp_language_standard = cpp_language_standard
-        self._cpp_language_standard_required = cpp_language_standard_required
-        self._cpp_compiler_extensions_required = cpp_compiler_extensions_required
+        self._project_language = project_language
+        self._language_standard = language_standard
+        self._language_standard_required = language_standard_required
+        self._compiler_extensions_required = compiler_extensions_required
 
+    @override
     def run(self, file) -> None:
         self._write_cmake_minimum_required_version(file)
         self._write_project_specifications(file)
@@ -65,17 +101,20 @@ class HeaderGeneratorPart(IGeneratorPart):
     def _write_project_specifications(self, file) -> None:
         file.write( f"project({self._project_name} "
                     f"VERSION {self._project_version} "
-                    f"LANGUAGES C CXX)\n\n"
+                    f"LANGUAGES {self._project_language.value})\n\n"
                     )
 
     def _write_language_specifications(self, file) -> None:
-        file.write( f"set(CMAKE_C_STANDARD {self._c_language_standard})\n"
-                    f"set(CMAKE_C_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._c_language_standard_required)})\n"
-                    f"set(CMAKE_C_EXTENSIONS {_adapt_to_cmake_bool(self._c_compiler_extensions_required)})\n\n"
+        cmake_compiler_settings_names_dict: dict[_COMPILER_SETTINGS_NAMES, str] = {}
 
-                    f"set(CMAKE_CXX_STANDARD {self._cpp_language_standard})\n"
-                    f"set(CMAKE_CXX_STANDARD_REQUIRED {_adapt_to_cmake_bool(self._cpp_language_standard_required)})\n"
-                    f"set(CMAKE_CXX_EXTENSIONS {_adapt_to_cmake_bool(self._cpp_compiler_extensions_required)})\n\n"
+        if self._project_language == Language.C:
+            cmake_compiler_settings_names_dict = _C_CMAKE_COMPILER_SETTINGS_NAMES
+        else:
+            cmake_compiler_settings_names_dict = _CPP_CMAKE_COMPILER_SETTINGS_NAMES
+
+        file.write( f"set({cmake_compiler_settings_names_dict[_COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD]} {self._language_standard})\n"
+                    f"set({cmake_compiler_settings_names_dict[_COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD_REQUIRED]} {_adapt_to_cmake_bool(self._language_standard_required)})\n"
+                    f"set({cmake_compiler_settings_names_dict[_COMPILER_SETTINGS_NAMES.COMPILER_EXTENSION_REQUIRED]} {_adapt_to_cmake_bool(self._compiler_extensions_required)})\n\n"
                     )
 
     def _write_destination_specifications(self, file) -> None:
@@ -104,13 +143,14 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
     def gmock_cmake_variable_name(self) -> str:
         return "GMOCK_CMAKE_LIB_NAME"
 
+    @override
     def run(self, file) -> None:
         self._write_gtest_header(file)
         self._write_gtest_gmock_cmake_variables(file)
 
     def _write_gtest_header(self, file) -> None:
-        file.write( f"include(FetchContent)\n")
-        file.write( f"FetchContent_Declare(\n"
+        file.write( f"include(FetchContent)\n"
+                    f"FetchContent_Declare(\n"
                     f"googletest\n"
                     f"GIT_REPOSITORY https://github.com/google/googletest.git\n"
                     f"GIT_TAG {self._git_tag}\n"
@@ -131,6 +171,41 @@ class GoogleTestLibraryGeneratorPart(IGeneratorPart):
 # ==========================================================================================================================
 
 
+class UnityLibraryGeneratorPart(IGeneratorPart):
+    def __init__(
+            self,
+            git_tag: str
+    ):
+        self._git_tag = git_tag
+
+    @property
+    def unity_cmake_variable_name(self) -> str:
+        return "UNITY_CMAKE_LIB_NAME"
+
+    @override
+    def run(self, file) -> None:
+        self._write_unity_header(file)
+        self._write_unity_cmake_variable(file)
+
+    def _write_unity_header(self, file) -> None:
+        file.write( f"include(FetchContent)\n"
+                    f"FetchContent_Declare(\n"
+                    f"Unity\n"
+                    f"GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git\n"
+                    f"GIT_TAG {self._git_tag}\n"
+                    )
+        file.write( f")\n\n")
+
+        file.write(f"FetchContent_MakeAvailable(Unity)\n\n")
+
+    def _write_unity_cmake_variable(self, file) -> None:
+        file.write( f"set({self.unity_cmake_variable_name} Unity)\n\n")
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
 class LibraryGeneratorPart(IGeneratorPart):
     def __init__(
             self,
@@ -144,6 +219,7 @@ class LibraryGeneratorPart(IGeneratorPart):
     def cmake_variable_name(self) -> str:
         return self._name.upper() + "_LIB_NAME"
 
+    @override
     def run(self, file) -> None:
         self._write_library_header(file)
 
@@ -170,6 +246,7 @@ class ExecutableGeneratorPart(IGeneratorPart):
     def cmake_variable_name(self) -> str:
         return self._name.upper() + "_EXE_NAME"
 
+    @override
     def run(self, file) -> None:
         self._write_executable_header(file)
 
@@ -193,6 +270,7 @@ class IncludeGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._include_directories = include_directories
 
+    @override
     def run(self, file):
         self._write_target_include_directories(file)
 
@@ -220,6 +298,7 @@ class SourceGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._source_files = source_files
 
+    @override
     def run(self, file):
         self._write_target_sources(file)
 
@@ -247,6 +326,7 @@ class DefinitionGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._compile_definitions = compile_definitions
 
+    @override
     def run(self, file):
         self._write_target_compile_definitions(file)
 
@@ -278,6 +358,7 @@ class LinkerGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._cmake_lib_var_names = cmake_lib_var_names
 
+    @override
     def run(self, file) -> None:
         self._write_target_link_libraries(file)
 

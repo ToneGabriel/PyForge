@@ -1,15 +1,13 @@
 from enum import Enum, auto
 
 from . import devfiles
-from .cmd import    CMDBuilder,\
-                    BuildType
-from .generator import  GeneratorBuilder,\
-                        CMakeLibraryType,\
-                        CMakeTargetVisibility
+from .cmd import *
+from .generator import *
 
 
 __all__ = ["ProductType",
            "BuildType",
+           "Language",
            "generate",
            "build"
            ]
@@ -19,33 +17,25 @@ _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
 
 
 class ProductType(Enum):
-    APP = auto()
-    LIB = auto()
-    DLL = auto()
-    TMP = auto()
+    EXE = auto()    # Standalone application (executable)
+    LIB = auto()    # Static library
+    DLL = auto()    # Dynamic linked library
 
 
 def generate(
         project_root_path: str,
+        project_ignored_dir_names: list[str],
         project_name: str,
         project_product_type: ProductType,
         project_version: str,
-        c_language_standard: int,
-        c_language_standard_required: bool,
-        c_compiler_extensions_required: bool,
-        cpp_language_standard: int,
-        cpp_language_standard_required: bool,
-        cpp_compiler_extensions_required: bool,
+        project_language: Language,
+        language_standard: int,
+        language_standard_required: bool,
+        compiler_extensions_required: bool,
         cmake_compile_definitions: list[tuple[str, str]]
 ) -> None:
         cmakelists_path = devfiles.get_cmakelists_file_path(project_root_path)
-
-        include_directories = devfiles.get_project_include_dirs(project_root_path)
-        source_files = devfiles.get_project_sources(project_root_path)
-        executable_file = devfiles.get_project_executable(project_root_path)
-
-        test_source_files = devfiles.get_test_sources(project_root_path)
-        test_executable_file = devfiles.get_test_executable(project_root_path)
+        include_directories, source_files, executable_file = devfiles.get_project_files_and_dirs(project_root_path, project_ignored_dir_names)
 
         builder = GeneratorBuilder()
 
@@ -53,114 +43,38 @@ def generate(
         builder.add_header(_CMAKE_MINIMUM_REQUIRED_VERSION,
                            project_name,
                            project_version,
-                           c_language_standard,
-                           c_language_standard_required,
-                           c_compiler_extensions_required,
-                           cpp_language_standard,
-                           cpp_language_standard_required,
-                           cpp_compiler_extensions_required
+                           project_language,
+                           language_standard,
+                           language_standard_required,
+                           compiler_extensions_required
                            )
 
+        # declare target
+        cmake_target_var_name = None
+
+        # create target based on product type
         match project_product_type:
-            case ProductType.APP:
-                # Standalone application (executable)
-                app_executable_cmake_variable_name = builder.add_executable(project_name,
-                                                                            executable_file
-                                                                            )
-
-                builder.add_target_include_directories(app_executable_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       include_directories
-                                                       )
-
-                builder.add_target_sources(app_executable_cmake_variable_name,
-                                           CMakeTargetVisibility.PRIVATE,
-                                           source_files
-                                           )
-
-                builder.add_target_compile_definitions(app_executable_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       cmake_compile_definitions
-                                                       )
+            case ProductType.EXE:
+                cmake_target_var_name = builder.add_executable(project_name, executable_file)
 
             case ProductType.LIB:
-                # Static library
-                static_lib_cmake_variable_name = builder.add_library(project_name,
-                                                                     CMakeLibraryType.STATIC
-                                                                     )
-
-                builder.add_target_include_directories(static_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PUBLIC,
-                                                       include_directories
-                                                       )
-
-                builder.add_target_sources(static_lib_cmake_variable_name,
-                                           CMakeTargetVisibility.PRIVATE,
-                                           source_files
-                                           )
-
-                builder.add_target_compile_definitions(static_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       cmake_compile_definitions
-                                                       )
+                cmake_target_var_name = builder.add_library(project_name, CMakeLibraryType.STATIC)
 
             case ProductType.DLL:
-                # Dynamic linked library
-                shared_lib_cmake_variable_name = builder.add_library(project_name,
-                                                                     CMakeLibraryType.SHARED
-                                                                     )
+                cmake_target_var_name = builder.add_library(project_name, CMakeLibraryType.SHARED)
 
-                builder.add_target_include_directories(shared_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PUBLIC,
-                                                       include_directories
-                                                       )
-
-                builder.add_target_sources(shared_lib_cmake_variable_name,
-                                           CMakeTargetVisibility.PRIVATE,
-                                           source_files
-                                           )
-
-                builder.add_target_compile_definitions(shared_lib_cmake_variable_name,
-                                                       CMakeTargetVisibility.PRIVATE,
-                                                       cmake_compile_definitions
-                                                       )
-
-            case ProductType.TMP:
-                # Template library
-                # Only headers matter and they must be included in some other target
-                pass
             case _:
-                raise RuntimeError(f"Invalid project build type: {project_product_type}.")
+                raise RuntimeError(f"Project product type not implemented: {project_product_type}")
 
-        # Googletest (gtest and gmock)
-        gtest_lib_name, gmock_lib_name = builder.add_googletest_library()
+        # add include, source and compile definitions to target
+        builder.add_target_include_directories(cmake_target_var_name, CMakeTargetVisibility.PUBLIC, include_directories)
+        builder.add_target_sources(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, source_files)
+        builder.add_target_compile_definitions(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, cmake_compile_definitions)
 
-        # Test executable
-        test_executable_name = builder.add_executable("test_" + project_name,
-                                                      test_executable_file
-                                                      )
+        # link imported libraries
+        # TODO
 
-        builder.add_target_linker(test_executable_name,
-                                  CMakeTargetVisibility.PRIVATE,
-                                  gtest_lib_name,
-                                  gmock_lib_name
-                                  )
-
-        builder.add_target_compile_definitions(test_executable_name,
-                                               CMakeTargetVisibility.PRIVATE,
-                                               cmake_compile_definitions
-                                               )
-
-        builder.add_target_include_directories(test_executable_name,
-                                               CMakeTargetVisibility.PRIVATE,
-                                               include_directories
-                                               )
-
-        builder.add_target_sources(test_executable_name,
-                                   CMakeTargetVisibility.PRIVATE,
-                                   source_files + test_source_files
-                                   )
-
+        # write ALL info in CMakelists.txt
         with open(cmakelists_path, "w") as cmakelists_root_open_file:
             builder.generator_product.run(cmakelists_root_open_file)
 
@@ -171,12 +85,12 @@ def build(
         c_compiler_path: str,
         cpp_compiler_path: str,
         cmake_bin_path: str,
-        buildsystem_bin_path: str,
+        ninja_bin_path: str,
         clean: bool=True
 ) -> None:
     build_dir_path = devfiles.get_build_dir_path(project_root_path)
 
-    builder = CMDBuilder(cmake_bin_path, buildsystem_bin_path)
+    builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
 
     if clean:
         builder.add_cmake_build_clear_part(build_dir_path)

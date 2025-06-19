@@ -1,5 +1,5 @@
 from enum import Enum
-from ._cmd_base import ICMDPart
+from ._cmd_base import ICMDPart, override
 
 
 class BuildType(Enum):
@@ -27,6 +27,7 @@ class CMakeGeneratePart(ICMDPart):
         self._c_compiler_path = c_compiler_path
         self._cpp_compiler_path = cpp_compiler_path
 
+    @override
     def get_cmd_text(self) -> str:
         ret = "cmake"
         ret += f" -S \"{self._cmakelists_root_dir_path}\""
@@ -53,6 +54,7 @@ class CMakeBuildPart(ICMDPart):
     ):
         self._build_dir_path = build_dir_path
 
+    @override
     def get_cmd_text(self) -> str:
         ret = f"cmake --build \"{self._build_dir_path}\""
         return ret
@@ -68,6 +70,7 @@ class CMakeBuildClearPart(ICMDPart):
     ):
         self._build_dir_path = build_dir_path
 
+    @override
     def get_cmd_text(self) -> str:
         ret = f"if exist \"{self._build_dir_path}\" rmdir /s /q \"{self._build_dir_path}\""
         return ret
