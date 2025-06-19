@@ -7,6 +7,7 @@ __all__ = ["CMakeLibraryType",
            "Language",
            "HeaderGeneratorPart",
            "LibraryGeneratorPart",
+           "ImportedLibraryGeneratorPart",
            "ExecutableGeneratorPart",
            "IncludeGeneratorPart",
            "SourceGeneratorPart",
@@ -227,6 +228,42 @@ class LibraryGeneratorPart(IGeneratorPart):
         file.write( f"set({self.cmake_variable_name} {self._name})\n"
                     f"add_library(${{{self.cmake_variable_name}}} {self._type.value})\n"
                     f"set_target_properties(${{{self.cmake_variable_name}}} PROPERTIES PREFIX \"\" IMPORT_PREFIX \"\")\n\n")
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
+
+class ImportedLibraryGeneratorPart(IGeneratorPart):
+    def __init__(
+            self,
+            name: str,
+            type: CMakeLibraryType,
+            imported_location : str,
+            imported_impl_location : str,
+            imported_include_dir : str
+    ):
+        self._name = name
+        self._type = type
+        self._imported_location = imported_location
+        self._imported_impl_location = imported_impl_location
+        self._imported_include_dir = imported_include_dir
+
+    @property
+    def cmake_variable_name(self) -> str:
+        return self._name.upper() + "_LIB_NAME"
+
+    @override
+    def run(self, file) -> None:
+        self._write_library_header(file)
+
+    def _write_library_header(self, file) -> None:
+        file.write( f"set({self.cmake_variable_name} {self._name})\n"
+                    f"add_library(${{{self.cmake_variable_name}}} {self._type.value} IMPORTED)\n"
+                    f"set_target_properties(${{{self.cmake_variable_name}}} PROPERTIES \n"
+                    f"IMPORTED_LOCATION ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._imported_location)}\n"
+                    f"IMPORTED_IMPLIB ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._imported_impl_location)}\n"
+                    f"INTERFACE_INCLUDE_DIRECTORIES ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._imported_include_dir)})\n\n")
 
 
 # ==========================================================================================================================

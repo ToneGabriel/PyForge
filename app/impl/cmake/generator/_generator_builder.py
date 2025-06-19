@@ -47,6 +47,17 @@ class GeneratorBuilder:
         self._generator.add_part(part)
         return part.cmake_variable_name
 
+    def add_imported_library(self,
+                             name: str,
+                             type: CMakeLibraryType,
+                             imported_location : str,
+                             imported_impl_location : str,
+                             imported_include_dir : str
+    ) -> str:
+        part = ImportedLibraryGeneratorPart(name, type, imported_location, imported_impl_location, imported_include_dir)
+        self._generator.add_part(part)
+        return part.cmake_variable_name
+
     def add_executable(self,
                        name: str,
                        executable_file: str,

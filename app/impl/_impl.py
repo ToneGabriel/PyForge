@@ -164,6 +164,8 @@ class ImplementationSharedState:
         self._check_initialization()
         cmake.generate( project_root_path=self._dataset.project_root_path,
                         project_ignored_dir_names=self._dataset.project_ignored_dir_names,
+                        project_imported_static_libs=self._dataset.project_imported_static_libs,
+                        project_imported_shared_libs=self._dataset.project_imported_shared_libs,
                         project_name=self._dataset.project_name,
                         project_product_type=self._dataset.project_product_type,
                         project_version=self._dataset.project_version,
