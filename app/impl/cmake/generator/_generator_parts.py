@@ -400,7 +400,8 @@ class LinkerGeneratorPart(IGeneratorPart):
         self._write_target_link_libraries(file)
 
     def _write_target_link_libraries(self, file) -> None:
-        file.write(f"target_link_libraries(${{{self._cmake_target_var_name}}} {self._visibility.value}\n")
-        for lib in self._cmake_lib_var_names:
-            file.write(f"${{{lib}}}\n")
-        file.write(f")\n\n")
+        if self._cmake_lib_var_names:
+            file.write(f"target_link_libraries(${{{self._cmake_target_var_name}}} {self._visibility.value}\n")
+            for lib in self._cmake_lib_var_names:
+                file.write(f"${{{lib}}}\n")
+            file.write(f")\n\n")
