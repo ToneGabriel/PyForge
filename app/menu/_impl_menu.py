@@ -1,7 +1,9 @@
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table
+
 from typing import Callable
+from functools import partial
 
 
 __all__ = ["OptionsMenu"]
@@ -11,12 +13,17 @@ class _Option:
     def __init__(
             self,
             label: str,
-            action: Callable,
+            action: Callable | None,
             *args
     ):
+        """
+        :param label: Option text
+        :param action: Option function
+        :param args: Option function bound arguments
+        :raises TypeError: if action not callable. (Can be None)
+        """
         self._label: str = label
-        self._action: Callable = action
-        self._action_args = args
+        self._action: partial = partial(action, *args) if action else None
 
     @property
     def label(self) -> str:
@@ -26,8 +33,10 @@ class _Option:
         return self._action is None
 
     def run(self) -> None:
-        if not self.empty():
-            return self._action(*self._action_args)
+        if self.empty():
+            return
+
+        self._action()
 
 
 # ==========================================================================================================================
@@ -35,27 +44,37 @@ class _Option:
 
 
 class OptionsMenu:
+    """
+    CMD menu with options from 1 to N where each option has a function bound to it
+    """
+
     def __init__(self):
         self._header_text = "Main Menu"     # default header text
         self._count: int = 1
         self._options: dict[int, _Option] = {}
 
-    def set_header_text(
-            self,
-            text: str
-    ) -> None:
+    def set_header_text(self, text: str) -> None:
+        """
+        :param text: Text to be shown as table title
+        """
         self._header_text = text
 
-    def add_option(
-            self,
-            label: str,
-            action: Callable,
-            *args
-    ) -> None:
+    def add_option(self, label: str, action: Callable, *args) -> None:
+        """
+        Add a new option to the table.
+
+        :param label: Option text
+        :param action: Option function
+        :param args: Option function bound arguments
+        """
         self._options[self._count] = _Option(label, action, *args)
         self._count += 1
 
     def run(self) -> None:
+        """
+        Start menu display and run functions safely
+        """
+
         MAIN_CONSOLE = Console()
         MENU_TABLE = self._build_menu_table()
 
@@ -66,7 +85,7 @@ class OptionsMenu:
             choice_index = int(Prompt.ask("Please enter your choice", choices=[str(i) for i in range(1, self._count)]))
             selected_option = self._options[choice_index]
 
-            # no function available at option (exit program)
+            # no function available at option (exit loop)
             if selected_option.empty():
                 MAIN_CONSOLE.print("Exiting... Goodbye!", style="yellow")
                 return
@@ -80,9 +99,14 @@ class OptionsMenu:
             else:
                 MAIN_CONSOLE.print("Operation successful!", style="green")
 
+            # make a pause to see the result before showing the table again
             Prompt.ask("\nPress Enter to continue", default="", show_default=False)
 
     def _build_menu_table(self) -> Table:
+        """
+        Create table border and options text
+        """
+
         table = Table(
             title=self._header_text,
             title_style="bold magenta",

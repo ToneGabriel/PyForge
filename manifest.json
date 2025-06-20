@@ -2,7 +2,7 @@
     "path_settings":
     {
         "root": "full\\path\\to\\your\\project\\root\\folder",
-        "ignore": [".git", "build", "config", "extern", "import"],
+        "ignore": [".git", "build", "config", "extern", "import", "test"],
         "import":
         {
             "static":
@@ -29,9 +29,9 @@
             "patch": 0
         },
 
-        "language": "C",
+        "language": "CPP",
         "product": "EXE",
-        "build": "DEBUGG",
+        "build": "RELEASE",
         "compile_definitions":
         [
             ["DEF_EXAMPLE", ""],
@@ -42,9 +42,9 @@
 
     "compiler_settings":
     {
-        "compiler_path": "leave_empty_or_path\\to\\your\\c_cpp\\compiler\\exe",
+        "compiler_path": "leave_empty_or_full\\path\\to\\your\\c_cpp\\compiler\\.exe",
         "compiler_extensions_required": false,
-        "language_standard": 17,
+        "language_standard": 20,
         "language_standard_required": true
     }
 }

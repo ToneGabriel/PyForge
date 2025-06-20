@@ -22,14 +22,14 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 ### path_settings
 - **root**: Full path to your C/C++ project root folder
 - **ignore**: List of folder names to be ignored when searching local include and source files
-- **import**: External dependencies: (**NOT IMPLEMENTED**)
+- **import**: External dependencies:
     - **`static`**: Declare a list of paths (leave empty if none):
-        - **`string param 1`**: Path to the actual library (.lib, .a)
-        - **`string param 2`**: Path to the public API for the library (include)
+        - **`string param 1`**: Relative path to the actual library (.lib, .a)
+        - **`string param 2`**: Relative path to the public API for the library (include)
     - **`shared`**: Declare a list of paths (leave empty if none):
-        - **`string param 1`**: Path to the actual library (.dll)
-        - **`string param 2`**: Path to the library implementation (.lib, .a)
-        - **`string param 3`**: Path to the public API for the library (include)
+        - **`string param 1`**: Relative path to the actual library (.dll)
+        - **`string param 2`**: Relative path to the library implementation (.lib, .a)
+        - **`string param 3`**: Relative path to the public API for the library (include)
 
 ### project_settings
 - **name**: Name of executable and library will be based on this

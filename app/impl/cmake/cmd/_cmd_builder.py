@@ -11,6 +11,10 @@ __all__ = ["CMDBuilder",
 
 
 class CMDBuilder:
+    """
+    Builder class for CMD that appends parts to it and returns the complete product
+    """
+
     def __init__(self, *env_paths: str):
         self.reset_cmd_product(*env_paths)
 
@@ -28,6 +32,15 @@ class CMDBuilder:
                                 c_compiler_path: str,
                                 cpp_compiler_path: str
     ) -> None:
+        """
+        Append cmake generate command to cmd list
+
+        :param cmakelists_root_dir_path: full path to CMakelists.txx
+        :param build_type: type of the build DEBUGG, RELEASE, DBGRELEASE, MINRELEASE
+        :param build_dir_path: full path to build directory
+        :param c_compiler_path: full path to C compiler exe
+        :param cpp_compiler_path: full path to C++ compiler exe
+        """
         part = CMakeGeneratePart(cmakelists_root_dir_path,
                                  build_type,
                                  build_dir_path,
@@ -39,11 +52,19 @@ class CMDBuilder:
     def add_cmake_build_part(self,
                              build_dir_path: str
     ) -> None:
+        """
+        Append cmake build command to cmd list
+        :param build_dir_path: full path to build directory
+        """
         part = CMakeBuildPart(build_dir_path)
         self._cmd_list.add_part(part)
 
     def add_cmake_build_clear_part(self,
                                    build_dir_path: str
     ) -> None:
+        """
+        Append cmake build rmdir command to cmd list
+        :param build_dir_path: full path to build directory to remove
+        """
         part = CMakeBuildClearPart(build_dir_path)
         self._cmd_list.add_part(part)

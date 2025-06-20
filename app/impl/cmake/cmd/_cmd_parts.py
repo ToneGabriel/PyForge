@@ -2,6 +2,9 @@ from enum import Enum
 from ._cmd_base import ICMDPart, override
 
 
+# Implemented ALL generator parts (as ICMDPart)
+
+
 class BuildType(Enum):
     DEBUGG = "Debugg"
     RELEASE = "Release"
@@ -21,6 +24,15 @@ class CMakeGeneratePart(ICMDPart):
                  c_compiler_path: str=None,
                  cpp_compiler_path: str=None
     ):
+        """
+        Create cmake generate command to append to cmd list
+
+        :param cmakelists_root_dir_path: full path to CMakelists.txx
+        :param build_type: type of the build `DEBUGG`, `RELEASE`, `DBGRELEASE`, `MINRELEASE`
+        :param build_dir_path: full path to build directory
+        :param c_compiler_path: full path to C compiler exe
+        :param cpp_compiler_path: full path to C++ compiler exe
+        """
         self._cmakelists_root_dir_path = cmakelists_root_dir_path
         self._build_type = build_type
         self._build_dir_path = build_dir_path
@@ -52,6 +64,10 @@ class CMakeBuildPart(ICMDPart):
     def __init__(self,
                  build_dir_path: str,
     ):
+        """
+        Create cmake build command to append to cmd list
+        :param build_dir_path: full path to build directory
+        """
         self._build_dir_path = build_dir_path
 
     @override
@@ -68,6 +84,10 @@ class CMakeBuildClearPart(ICMDPart):
     def __init__(self,
                  build_dir_path: str
     ):
+        """
+        Create cmake build rmdir command to append to cmd list
+        :param build_dir_path: full path to build directory to remove
+        """
         self._build_dir_path = build_dir_path
 
     @override
