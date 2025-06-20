@@ -10,6 +10,10 @@ __all__ = ["GeneratorBuilder",
 
 
 class GeneratorBuilder:
+    """
+    Builder class for Generator that appends parts to it and returns the complete product
+    """
+
     def __init__(self):
         self.reset_generator_product()
 
@@ -29,6 +33,16 @@ class GeneratorBuilder:
                    language_standard_required: bool,
                    compiler_extensions_required: bool,
     ) -> None:
+        """
+        Append Header part to generator
+        :param cmake_minimum_required_version: str with minimum cmake version (format: major.minor.patch)
+        :param project_name: str with project name
+        :param project_version: str with project version (format: major.minor.patch)
+        :param project_language: language C or CPP
+        :param language_standard: int for C/C++ language standard
+        :param language_standard_required: `False` to use lower standard
+        :param compiler_extensions_required: `True` to use optional compiler specific extensions
+        """
         part = HeaderGeneratorPart(cmake_minimum_required_version,
                                    project_name,
                                    project_version,
@@ -43,6 +57,14 @@ class GeneratorBuilder:
                     name: str,
                     type: CMakeLibraryType,
     ) -> str:
+        """
+        Append Library part to generator
+
+        :param name: name of the compiled library file
+        :param type: library type (STATIC, SHARED, INTERFACE)
+        :returns str: cmake variable name for the newly created library
+        (used in `add_target_include_directories`, `add_target_sources`, `add_target_compile_definitions`, `add_target_linker`)
+        """
         part = LibraryGeneratorPart(name, type)
         self._generator.add_part(part)
         return part.cmake_variable_name
@@ -54,6 +76,19 @@ class GeneratorBuilder:
                              imported_impl_location : str,
                              imported_include_dir : str
     ) -> str:
+        """
+        Append Imported Library part to generator
+
+        :param name: name used to generate the cmake variable name
+        :param type: library type (STATIC, SHARED, INTERFACE)
+        :param imported_location: relative path where to find the library
+        :param imported_impl_location: relative path where to find the library implementation
+        (used for SHARED implementation library, can use `imported_location` if STATIC)
+        :param imported_include_dir: relative path to imported library headers directory
+        :returns str: cmake variable name for the newly created library
+        (used in `add_target_include_directories`, `add_target_sources`, `add_target_compile_definitions`, `add_target_linker`)
+        """
+
         part = ImportedLibraryGeneratorPart(name, type, imported_location, imported_impl_location, imported_include_dir)
         self._generator.add_part(part)
         return part.cmake_variable_name
@@ -62,6 +97,14 @@ class GeneratorBuilder:
                        name: str,
                        executable_file: str,
     ) -> str:
+        """
+        Append Executable part to generator
+
+        :param name: name of the compiled executable file
+        :param executable_file: relative path to main.c or main.cpp file
+        :returns str: cmake variable name for the newly created executable
+        """
+
         part = ExecutableGeneratorPart(name, executable_file)
         self._generator.add_part(part)
         return part.cmake_variable_name
@@ -71,6 +114,13 @@ class GeneratorBuilder:
                                        visibility: CMakeTargetVisibility,
                                        include_directories: list[str]
     ) -> None:
+        """
+        Append Include Directory part to generator
+
+        :param cmake_target_var_name: name of target to add headers to (returned from `add_library`, `add_imported_library`, `add_executable`)
+        :param visibility: cmake forward visibility
+        :param include_directories: list of relative paths to header directories
+        """
         part = IncludeGeneratorPart(cmake_target_var_name, visibility, include_directories)
         self._generator.add_part(part)
 
@@ -79,6 +129,14 @@ class GeneratorBuilder:
                            visibility: CMakeTargetVisibility,
                            source_files: list[str],
     ) -> None:
+        """
+        Append Sources part to generator
+
+        :param cmake_target_var_name: name of target to add headers to (returned from `add_library`, `add_imported_library`, `add_executable`)
+        :param visibility: cmake forward visibility
+        :param source_files: list of relative paths to source files
+        """
+
         part = SourceGeneratorPart(cmake_target_var_name, visibility, source_files)
         self._generator.add_part(part)
 
@@ -87,27 +145,29 @@ class GeneratorBuilder:
                                        visibility: CMakeTargetVisibility,
                                        compile_definitions: list[tuple[str, str]]
     ) -> None:
+        """
+        Append Compile Definitions part to generator
+
+        :param cmake_target_var_name: name of target to add headers to (returned from `add_library`, `add_imported_library`, `add_executable`)
+        :param visibility: cmake forward visibility
+        :param compile_definitions: list of pairs of str (first: MACRO name, second: MACRO value)
+        """
+
         part = DefinitionGeneratorPart(cmake_target_var_name, visibility, compile_definitions)
         self._generator.add_part(part)
 
     def add_target_linker(self,
                           cmake_target_var_name: str,
                           visibility: CMakeTargetVisibility,
-                          *cmake_other_var_names
+                          *cmake_lib_var_names
     ) -> None:
-        part = LinkerGeneratorPart(cmake_target_var_name, visibility, *cmake_other_var_names)
-        self._generator.add_part(part)
+        """
+        Append Linker part to generator
 
-    def add_googletest_library(self,
-                               git_tag: str="main"
-    ) -> tuple[str, str]:
-        part = GoogleTestLibraryGeneratorPart(git_tag)
-        self._generator.add_part(part)
-        return [part.gtest_cmake_variable_name, part.gmock_cmake_variable_name]
+        :param cmake_target_var_name: the cmake variable name to be linked onto (created by add_library, add_imported_library, add_executable)
+        :param visibility: cmake forward visibility
+        :param cmake_lib_var_names: the cmake variable names to be linked to the first param (created by add_library, add_imported_library)
+        """
 
-    def add_unity_library(self,
-                          git_tag: str="master"
-    ) -> str:
-        part = UnityLibraryGeneratorPart(git_tag)
+        part = LinkerGeneratorPart(cmake_target_var_name, visibility, *cmake_lib_var_names)
         self._generator.add_part(part)
-        return part.unity_cmake_variable_name

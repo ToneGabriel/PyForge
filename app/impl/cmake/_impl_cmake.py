@@ -17,6 +17,10 @@ _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
 
 
 def _get_next_library_name() -> str:
+    """
+    Generate sequential `import_lib` names
+    """
+
     if not hasattr(_get_next_library_name, "index"):
         _get_next_library_name.index = 0
 
@@ -44,6 +48,10 @@ def generate(
         compiler_extensions_required: bool,
         cmake_compile_definitions: list[tuple[str, str]]
 ) -> None:
+        """
+        Generate the CMakelists.txt file
+        """
+
         cmakelists_path = devfiles.get_cmakelists_file_path(project_root_path)
         include_directories, source_files, executable_file = devfiles.get_project_files_and_dirs(project_root_path, project_ignored_dir_names)
 
@@ -109,6 +117,10 @@ def build(
         ninja_bin_path: str,
         clean: bool=True
 ) -> None:
+    """
+    Run commands in console for cmake build
+    """
+
     build_dir_path = devfiles.get_build_dir_path(project_root_path)
 
     builder = CMDBuilder(cmake_bin_path, ninja_bin_path)

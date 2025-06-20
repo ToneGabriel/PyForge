@@ -19,10 +19,18 @@ _PROJECT_BUILD_DIR_NAME = "build"
 
 
 def get_cmakelists_file_path(project_root_path: str) -> str:
+    """
+    :param project_root_path: full path to the project
+    :returns str: full path to the CMakelists.txt file
+    """
     return os.path.join(project_root_path, _CMAKELISTS_FILE_NAME)
 
 
 def get_build_dir_path(project_root_path: str) -> str:
+    """
+    :param project_root_path: full path to the project
+    :returns str: full path to the build directory
+    """
     return os.path.join(project_root_path, _PROJECT_BUILD_DIR_NAME)
 
 

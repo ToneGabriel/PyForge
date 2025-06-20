@@ -2,6 +2,9 @@ from enum import Enum, auto
 from ._generator_base import IGeneratorPart, override
 
 
+# Implemented ALL generator parts (as IGeneratorPart)
+
+
 __all__ = ["CMakeLibraryType",
            "CMakeTargetVisibility",
            "Language",
@@ -12,9 +15,7 @@ __all__ = ["CMakeLibraryType",
            "IncludeGeneratorPart",
            "SourceGeneratorPart",
            "DefinitionGeneratorPart",
-           "LinkerGeneratorPart",
-           "GoogleTestLibraryGeneratorPart",
-           "UnityLibraryGeneratorPart"
+           "LinkerGeneratorPart"
            ]
 
 
@@ -81,6 +82,17 @@ class HeaderGeneratorPart(IGeneratorPart):
             language_standard_required: bool,
             compiler_extensions_required: bool
     ):
+        """
+        Create Header part to append to generator
+        :param cmake_minimum_required_version: str with minimum cmake version (format: major.minor.patch)
+        :param project_name: str with project name
+        :param project_version: str with project version (format: major.minor.patch)
+        :param project_language: language C or CPP
+        :param language_standard: int for C/C++ language standard
+        :param language_standard_required: `False` to use lower standard
+        :param compiler_extensions_required: `True` to use optional compiler specific extensions
+        """
+
         self._cmake_minimum_required_version = cmake_minimum_required_version
         self._project_name = project_name
         self._project_version = project_version
@@ -129,90 +141,19 @@ class HeaderGeneratorPart(IGeneratorPart):
 # ==========================================================================================================================
 
 
-class GoogleTestLibraryGeneratorPart(IGeneratorPart):
-    def __init__(
-            self,
-            git_tag: str
-    ):
-        self._git_tag = git_tag
-
-    @property
-    def gtest_cmake_variable_name(self) -> str:
-        return "GTEST_CMAKE_LIB_NAME"
-
-    @property
-    def gmock_cmake_variable_name(self) -> str:
-        return "GMOCK_CMAKE_LIB_NAME"
-
-    @override
-    def run(self, file) -> None:
-        self._write_gtest_header(file)
-        self._write_gtest_gmock_cmake_variables(file)
-
-    def _write_gtest_header(self, file) -> None:
-        file.write( f"include(FetchContent)\n"
-                    f"FetchContent_Declare(\n"
-                    f"googletest\n"
-                    f"GIT_REPOSITORY https://github.com/google/googletest.git\n"
-                    f"GIT_TAG {self._git_tag}\n"
-                    )
-        file.write( f")\n\n")
-
-        file.write( f"set(INSTALL_GTEST OFF CACHE BOOL \"Disable installation of googletest\" FORCE)\n\n"
-                    f"FetchContent_MakeAvailable(googletest)\n\n"
-                    )
-
-    def _write_gtest_gmock_cmake_variables(self, file) -> None:
-        file.write( f"set({self.gtest_cmake_variable_name} gtest)\n"
-                    f"set({self.gmock_cmake_variable_name} gmock)\n\n"
-                    )
-
-
-# ==========================================================================================================================
-# ==========================================================================================================================
-
-
-class UnityLibraryGeneratorPart(IGeneratorPart):
-    def __init__(
-            self,
-            git_tag: str
-    ):
-        self._git_tag = git_tag
-
-    @property
-    def unity_cmake_variable_name(self) -> str:
-        return "UNITY_CMAKE_LIB_NAME"
-
-    @override
-    def run(self, file) -> None:
-        self._write_unity_header(file)
-        self._write_unity_cmake_variable(file)
-
-    def _write_unity_header(self, file) -> None:
-        file.write( f"include(FetchContent)\n"
-                    f"FetchContent_Declare(\n"
-                    f"Unity\n"
-                    f"GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git\n"
-                    f"GIT_TAG {self._git_tag}\n"
-                    )
-        file.write( f")\n\n")
-
-        file.write(f"FetchContent_MakeAvailable(Unity)\n\n")
-
-    def _write_unity_cmake_variable(self, file) -> None:
-        file.write( f"set({self.unity_cmake_variable_name} Unity)\n\n")
-
-
-# ==========================================================================================================================
-# ==========================================================================================================================
-
-
 class LibraryGeneratorPart(IGeneratorPart):
     def __init__(
             self,
             name: str,
             type: CMakeLibraryType,
     ):
+        """
+        Create Library part to append to generator
+
+        :param name: name of the compiled library file
+        :param type: library type (STATIC, SHARED, INTERFACE)
+        """
+
         self._name = name
         self._type = type
 
@@ -243,6 +184,17 @@ class ImportedLibraryGeneratorPart(IGeneratorPart):
             imported_impl_location : str,
             imported_include_dir : str
     ):
+        """
+        Create Imported Library part to append to generator
+
+        :param name: name used to generate the cmake variable name
+        :param type: library type (STATIC, SHARED, INTERFACE)
+        :param imported_location: relative path where to find the library
+        :param imported_impl_location: relative path where to find the library implementation
+        (used for SHARED implementation library, can use `imported_location` if STATIC)
+        :param imported_include_dir: relative path to imported library headers directory
+        """
+
         self._name = name
         self._type = type
         self._imported_location = imported_location
@@ -276,6 +228,13 @@ class ExecutableGeneratorPart(IGeneratorPart):
             name: str,
             executable_file: str
     ):
+        """
+        Create Executable part to append to generator
+
+        :param name: name of the compiled executable file
+        :param executable_file: relative path to main.c or main.cpp file
+        """
+
         self._name = name
         self._executable_file = executable_file
 
@@ -303,6 +262,14 @@ class IncludeGeneratorPart(IGeneratorPart):
                  visibility: CMakeTargetVisibility,
                  include_directories: list[str]
     ):
+        """
+        Create Include Directory part to append to generator
+
+        :param cmake_target_var_name: name of target to add headers to (returned from `add_library`, `add_imported_library`, `add_executable`)
+        :param visibility: cmake forward visibility
+        :param include_directories: list of relative paths to header directories
+        """
+
         self._cmake_target_var_name = cmake_target_var_name
         self._visibility = visibility
         self._include_directories = include_directories
@@ -331,6 +298,14 @@ class SourceGeneratorPart(IGeneratorPart):
                  visibility: CMakeTargetVisibility,
                  source_files: list[str]
     ):
+        """
+        Create Sources part to append to generator
+
+        :param cmake_target_var_name: name of target to add headers to (returned from `add_library`, `add_imported_library`, `add_executable`)
+        :param visibility: cmake forward visibility
+        :param source_files: list of relative paths to source files
+        """
+
         self._cmake_target_var_name = cmake_target_var_name
         self._visibility = visibility
         self._source_files = source_files
@@ -359,6 +334,14 @@ class DefinitionGeneratorPart(IGeneratorPart):
                  visibility: CMakeTargetVisibility,
                  compile_definitions: list[tuple[str, str]]
     ):
+        """
+        Create Compile Definitions part to append to generator
+
+        :param cmake_target_var_name: name of target to add headers to (returned from `add_library`, `add_imported_library`, `add_executable`)
+        :param visibility: cmake forward visibility
+        :param compile_definitions: list of pairs of str (first: MACRO name, second: MACRO value)
+        """
+
         self._cmake_target_var_name = cmake_target_var_name
         self._visibility = visibility
         self._compile_definitions = compile_definitions
@@ -391,6 +374,14 @@ class LinkerGeneratorPart(IGeneratorPart):
             visibility: CMakeTargetVisibility,
             *cmake_lib_var_names
     ):
+        """
+        Create Linker part to append to generator. Not created if cmake_lib_var_names is `None`
+
+        :param cmake_target_var_name: the cmake variable name to be linked onto (created by add_library, add_imported_library, add_executable)
+        :param visibility: cmake forward visibility
+        :param cmake_lib_var_names: the cmake variable names to be linked to the first param (created by add_library, add_imported_library)
+        """
+
         self._cmake_target_var_name = cmake_target_var_name
         self._visibility = visibility
         self._cmake_lib_var_names = cmake_lib_var_names

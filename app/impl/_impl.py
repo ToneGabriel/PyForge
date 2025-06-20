@@ -48,6 +48,9 @@ _EXPECTED_JSON_STRUCTURE = {
 
 
 class _Dataset:
+    """
+    Structure representing the parsed json file
+    """
     def __init__(self, json_path: str):
         self._json_data = jsonvalid.load(json_path, _EXPECTED_JSON_STRUCTURE)
 
@@ -130,6 +133,10 @@ class _Dataset:
 
 
 class ImplementationSharedState:
+    """
+    Singleton class used to centralize ALL cmake and cmd functions
+    """
+
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -138,6 +145,7 @@ class ImplementationSharedState:
         return cls._instance
 
     def __init__(self):
+        # declare first
         self._json_path = None
         self._cmake_bin_path = None
         self._ninja_bin_path = None
@@ -154,13 +162,21 @@ class ImplementationSharedState:
         self.reload()
 
     def is_initialized(self) -> bool:
-        return self._json_path is not None
+        return all(param is not None for param in (self._json_path,
+                                                   self._cmake_bin_path,
+                                                   self._ninja_bin_path))
 
     def reload(self) -> None:
+        """
+        Reload data from json if changed while running
+        """
         self._check_initialization()
         self._dataset = _Dataset(self._json_path)
 
     def generate_cmakelists(self) -> None:
+        """
+        Check if json data was parsed and generate CMakelists.txt file
+        """
         self._check_initialization()
         cmake.generate( project_root_path=self._dataset.project_root_path,
                         project_ignored_dir_names=self._dataset.project_ignored_dir_names,
@@ -177,6 +193,9 @@ class ImplementationSharedState:
         )
 
     def build_project(self, clean: bool=False) -> None:
+        """
+        Check if json data was parsed and apply cmd commands for cmake build
+        """
         self._check_initialization()
         cmake.build(project_root_path=self._dataset.project_root_path,
                     project_build_type=self._dataset.project_build_type,
