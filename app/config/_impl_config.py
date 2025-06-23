@@ -4,7 +4,7 @@ import sys
 
 __all__ = ["CMAKE_BIN_PATH",
            "NINJA_BIN_PATH",
-           "JSON_PATH"
+           "JSON_MANIFEST_PATH"
            ]
 
 
@@ -32,4 +32,4 @@ CMAKE_BIN_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "deps", "cmake", "bin
 NINJA_BIN_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "deps", "ninja", "bin")
 
 # Relative path to json manifest for user settings
-JSON_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "manifest.json")
+JSON_MANIFEST_PATH: str = os.path.join(_ENVIRONMENT_ROOT_PATH, "manifest.json")

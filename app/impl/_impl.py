@@ -192,7 +192,7 @@ class ImplementationSharedState:
                         cmake_compile_definitions=self._dataset.cmake_compile_definitions
         )
 
-    def build_project(self, clean: bool=False) -> None:
+    def build_project(self, clean: bool=False, install: bool=False) -> None:
         """
         Check if json data was parsed and apply cmd commands for cmake build
         """
@@ -203,7 +203,8 @@ class ImplementationSharedState:
                     cpp_compiler_path=self._dataset.compiler_path,
                     cmake_bin_path=self._cmake_bin_path,
                     ninja_bin_path=self._ninja_bin_path,
-                    clean=clean
+                    clean=clean,
+                    install=install
         )
 
     def _check_initialization(self) -> None:

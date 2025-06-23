@@ -17,16 +17,18 @@ def main(json_path: str,
     # create menu and map buttons to implementation functions
     main_menu = menu.OptionsMenu()
     main_menu.set_header_text("PyForge")
-    main_menu.add_option("Reload", impl_state.reload)
-    main_menu.add_option("Generate CMakeLists", impl_state.generate_cmakelists)
+    main_menu.add_option("Reload Manifest", impl_state.reload)
+    main_menu.add_option("Generate Project CMakeLists", impl_state.generate_cmakelists)
     main_menu.add_option("Build Project", impl_state.build_project)
     main_menu.add_option("Build Project Clean", impl_state.build_project, True)
+    main_menu.add_option("Build Project and Install", impl_state.build_project, False, True)
+    main_menu.add_option("Build Project Clean and Install", impl_state.build_project, True, True)
     main_menu.add_option("Exit", None)
     main_menu.run()
 
 
 if __name__ == "__main__":
-    main(config.JSON_PATH,
+    main(config.JSON_MANIFEST_PATH,
          config.CMAKE_BIN_PATH,
          config.NINJA_BIN_PATH
     )

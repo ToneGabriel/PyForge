@@ -1,8 +1,5 @@
 from ._cmd_base import CMDList
-from ._cmd_parts import CMakeGeneratePart,\
-                        CMakeBuildPart,\
-                        CMakeBuildClearPart,\
-                        BuildType
+from ._cmd_parts import *
 
 
 __all__ = ["CMDBuilder",
@@ -29,6 +26,7 @@ class CMDBuilder:
                                 cmakelists_root_dir_path: str,
                                 build_type: BuildType,
                                 build_dir_path: str,
+                                install_dir_path: str,
                                 c_compiler_path: str,
                                 cpp_compiler_path: str
     ) -> None:
@@ -38,12 +36,14 @@ class CMDBuilder:
         :param cmakelists_root_dir_path: full path to CMakelists.txx
         :param build_type: type of the build DEBUGG, RELEASE, DBGRELEASE, MINRELEASE
         :param build_dir_path: full path to build directory
+        :param install_dir_path: full path to install directory
         :param c_compiler_path: full path to C compiler exe
         :param cpp_compiler_path: full path to C++ compiler exe
         """
         part = CMakeGeneratePart(cmakelists_root_dir_path,
                                  build_type,
                                  build_dir_path,
+                                 install_dir_path,
                                  c_compiler_path,
                                  cpp_compiler_path
                                  )
@@ -59,12 +59,22 @@ class CMDBuilder:
         part = CMakeBuildPart(build_dir_path)
         self._cmd_list.add_part(part)
 
-    def add_cmake_build_clear_part(self,
-                                   build_dir_path: str
+    def add_cmake_install_part(self,
+                               build_dir_path: str
     ) -> None:
         """
-        Append cmake build rmdir command to cmd list
-        :param build_dir_path: full path to build directory to remove
+        Append cmake install command to cmd list
+        :param build_dir_path: full path to build directory
         """
-        part = CMakeBuildClearPart(build_dir_path)
+        part = CMakeInstallPart(build_dir_path)
+        self._cmd_list.add_part(part)
+
+    def add_rmdir_part(self,
+                       dir_path: str
+    ) -> None:
+        """
+        Append rmdir command to cmd list
+        :param dir_path: full path to directory to remove
+        """
+        part = RMDIRPart(dir_path)
         self._cmd_list.add_part(part)

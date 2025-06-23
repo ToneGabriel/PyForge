@@ -115,26 +115,33 @@ def build(
         cpp_compiler_path: str,
         cmake_bin_path: str,
         ninja_bin_path: str,
-        clean: bool=True
+        clean: bool=False,
+        install: bool=False
 ) -> None:
     """
-    Run commands in console for cmake build
+    Run commands in console for cmake build and install
     """
 
     build_dir_path = devfiles.get_build_dir_path(project_root_path)
+    install_dir_path = devfiles.get_install_dir_path(project_root_path)
 
     builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
 
     if clean:
-        builder.add_cmake_build_clear_part(build_dir_path)
+        builder.add_rmdir_part(build_dir_path)
 
     builder.add_cmake_generate_part(project_root_path,
                                     project_build_type,
                                     build_dir_path,
+                                    install_dir_path,
                                     c_compiler_path,
                                     cpp_compiler_path
                                     )
 
     builder.add_cmake_build_part(build_dir_path)
+
+    if install:
+        builder.add_rmdir_part(install_dir_path)    # always clean
+        builder.add_cmake_install_part(build_dir_path)
 
     builder.cmd_product.run()
