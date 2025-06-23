@@ -18,11 +18,9 @@ def main(json_path: str,
     main_menu = menu.OptionsMenu()
     main_menu.set_header_text("PyForge")
     main_menu.add_option("Reload Manifest", impl_state.reload)
-    main_menu.add_option("Generate Project CMakeLists", impl_state.generate_cmakelists)
+    main_menu.add_option("Configure Project", impl_state.configure_project)
     main_menu.add_option("Build Project", impl_state.build_project)
-    main_menu.add_option("Build Project Clean", impl_state.build_project, True)
-    main_menu.add_option("Build Project and Install", impl_state.build_project, False, True)
-    main_menu.add_option("Build Project Clean and Install", impl_state.build_project, True, True)
+    main_menu.add_option("Install Project", impl_state.install_project)
     main_menu.add_option("Exit", None)
     main_menu.run()
 

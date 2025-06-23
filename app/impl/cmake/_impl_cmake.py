@@ -9,7 +9,9 @@ __all__ = ["ProductType",
            "BuildType",
            "Language",
            "generate",
-           "build"
+           "configure",
+           "build",
+           "install"
            ]
 
 
@@ -108,28 +110,19 @@ def generate(
             builder.generator_product.run(cmakelists_root_open_file)
 
 
-def build(
-        project_root_path: str,
-        project_build_type: BuildType,
-        c_compiler_path: str,
-        cpp_compiler_path: str,
-        cmake_bin_path: str,
-        ninja_bin_path: str,
-        clean: bool=False,
-        install: bool=False
+def configure(project_root_path: str,
+              project_build_type: BuildType,
+              c_compiler_path: str,
+              cpp_compiler_path: str,
+              cmake_bin_path: str,
+              ninja_bin_path: str
 ) -> None:
-    """
-    Run commands in console for cmake build and install
-    """
-
     build_dir_path = devfiles.get_build_dir_path(project_root_path)
     install_dir_path = devfiles.get_install_dir_path(project_root_path)
 
     builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
 
-    if clean:
-        builder.add_rmdir_part(build_dir_path)
-
+    builder.add_rmdir_part(build_dir_path)
     builder.add_cmake_generate_part(project_root_path,
                                     project_build_type,
                                     build_dir_path,
@@ -137,11 +130,38 @@ def build(
                                     c_compiler_path,
                                     cpp_compiler_path
                                     )
+    builder.cmd_product.run()
+
+
+def build(
+        project_root_path: str,
+        cmake_bin_path: str,
+        ninja_bin_path: str,
+) -> None:
+    """
+    Run commands in console for cmake build
+    """
+
+    build_dir_path = devfiles.get_build_dir_path(project_root_path)
+
+    builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
 
     builder.add_cmake_build_part(build_dir_path)
+    builder.cmd_product.run()
 
-    if install:
-        builder.add_rmdir_part(install_dir_path)    # always clean
-        builder.add_cmake_install_part(build_dir_path)
 
+def install(
+        project_root_path: str,
+        cmake_bin_path: str,
+        ninja_bin_path: str,
+) -> None:
+    """
+    Run commands in console for cmake install
+    """
+
+    build_dir_path = devfiles.get_build_dir_path(project_root_path)
+
+    builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
+
+    builder.add_cmake_install_part(build_dir_path)
     builder.cmd_product.run()

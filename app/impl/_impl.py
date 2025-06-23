@@ -173,9 +173,9 @@ class ImplementationSharedState:
         self._check_initialization()
         self._dataset = _Dataset(self._json_path)
 
-    def generate_cmakelists(self) -> None:
+    def configure_project(self) -> None:
         """
-        Check if json data was parsed and generate CMakelists.txt file
+        Check if json data was parsed, generate CMakelists.txt file and run cmake configuration
         """
         self._check_initialization()
         cmake.generate( project_root_path=self._dataset.project_root_path,
@@ -191,20 +191,32 @@ class ImplementationSharedState:
                         compiler_extensions_required=self._dataset.compiler_extensions_required,
                         cmake_compile_definitions=self._dataset.cmake_compile_definitions
         )
+        cmake.configure(project_root_path=self._dataset.project_root_path,
+                        project_build_type=self._dataset.project_build_type,
+                        c_compiler_path=self._dataset.compiler_path,
+                        cpp_compiler_path=self._dataset.compiler_path,
+                        cmake_bin_path=self._cmake_bin_path,
+                        ninja_bin_path=self._ninja_bin_path,
+        )
 
-    def build_project(self, clean: bool=False, install: bool=False) -> None:
+    def build_project(self) -> None:
         """
         Check if json data was parsed and apply cmd commands for cmake build
         """
         self._check_initialization()
         cmake.build(project_root_path=self._dataset.project_root_path,
-                    project_build_type=self._dataset.project_build_type,
-                    c_compiler_path=self._dataset.compiler_path,
-                    cpp_compiler_path=self._dataset.compiler_path,
                     cmake_bin_path=self._cmake_bin_path,
                     ninja_bin_path=self._ninja_bin_path,
-                    clean=clean,
-                    install=install
+        )
+
+    def install_project(self) -> None:
+        """
+        Check if json data was parsed and apply cmd commands for cmake install
+        """
+        self._check_initialization()
+        cmake.install(project_root_path=self._dataset.project_root_path,
+                      cmake_bin_path=self._cmake_bin_path,
+                      ninja_bin_path=self._ninja_bin_path,
         )
 
     def _check_initialization(self) -> None:
