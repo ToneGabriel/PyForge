@@ -37,7 +37,8 @@ class ProductType(Enum):
 
 def generate(
         project_root_path: str,
-        project_ignored_dir_names: list[str],
+        project_include_dir_names: list[str],
+        project_source_ignored_dir_names: list[str],
         project_imported_static_libs: list[tuple[str, str]],
         project_imported_shared_libs: list[tuple[str, str, str]],
         project_name: str,
@@ -54,7 +55,7 @@ def generate(
         """
 
         cmakelists_path = devfiles.get_cmakelists_file_path(project_root_path)
-        include_directories, source_files, executable_file = devfiles.get_project_files_and_dirs(project_root_path, project_ignored_dir_names)
+        project_source_files = devfiles.get_project_source_files(project_root_path, project_source_ignored_dir_names)
 
         builder = GeneratorBuilder()
 
@@ -75,7 +76,7 @@ def generate(
         # create target based on product type
         match project_product_type:
             case ProductType.EXE:
-                cmake_target_var_name = builder.add_executable(project_name, executable_file)
+                cmake_target_var_name = builder.add_executable(project_name)
 
             case ProductType.LIB:
                 cmake_target_var_name = builder.add_library(project_name, CMakeLibraryType.STATIC)
@@ -87,8 +88,8 @@ def generate(
                 raise RuntimeError(f"Project product type not implemented: {project_product_type}")
 
         # add include, source and compile definitions to target
-        builder.add_target_include_directories(cmake_target_var_name, CMakeTargetVisibility.PUBLIC, include_directories)
-        builder.add_target_sources(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, source_files)
+        builder.add_target_include_directories(cmake_target_var_name, CMakeTargetVisibility.PUBLIC, project_include_dir_names)
+        builder.add_target_sources(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, project_source_files)
         builder.add_target_compile_definitions(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, cmake_compile_definitions)
 
         # create static imported libraries

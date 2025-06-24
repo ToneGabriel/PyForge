@@ -1,20 +1,26 @@
 {
     "path_settings":
     {
-        "root": "full\\path\\to\\your\\project\\root\\folder",
-        "ignore": [".git", "build", "config", "extern", "import", "test"],
-        "import":
+        "root_dir": "full\\path\\to\\your\\project\\root\\folder",
+        "include_dirs":
+        [
+            "relative\\path\\to\\include\\folder_1",
+            "relative\\path\\to\\include\\folder_2"
+        ],
+        "source_dirs_ignore": [".git", "build", "config", "extern", "import", "test"],
+
+        "imports":
         {
             "static":
             [
-                ["path\\to\\library1\\implementation\\.lib_.a", "path\\to\\library1\\include"],
-                ["path\\to\\library2\\implementation\\.lib_.a", "path\\to\\library2\\include"]
+                ["relative\\path\\to\\library1\\implementation\\.lib_.a", "relative\\path\\to\\library1\\include"],
+                ["relative\\path\\to\\library2\\implementation\\.lib_.a", "relative\\path\\to\\library2\\include"]
             ],
 
             "shared":
             [
-                ["path\\to\\library1\\.dll", "path\\to\\library1\\implementation\\.lib_.a", "path\\to\\library1\\include"],
-                ["path\\to\\library2\\.dll", "path\\to\\library2\\implementation\\.lib_.a", "path\\to\\library2\\include"]
+                ["relative\\path\\to\\library1\\.dll", "relative\\path\\to\\library1\\implementation\\.lib_.a", "relative\\path\\to\\library1\\include"],
+                ["relative\\path\\to\\library2\\.dll", "relative\\path\\to\\library2\\implementation\\.lib_.a", "relative\\path\\to\\library2\\include"]
             ]
         }
     },

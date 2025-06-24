@@ -95,7 +95,7 @@ class GeneratorBuilder:
 
     def add_executable(self,
                        name: str,
-                       executable_file: str,
+                       executable_file: str=None,
     ) -> str:
         """
         Append Executable part to generator

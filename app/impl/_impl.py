@@ -8,9 +8,10 @@ __all__ = ["ImplementationSharedState"]
 _EXPECTED_JSON_STRUCTURE = {
     "path_settings":
     {
-        "root": str,
-        "ignore": list,
-        "import":
+        "root_dir": str,
+        "include_dirs": list,
+        "source_dirs_ignore": list,
+        "imports":
         {
             "static": list,
             "shared": list
@@ -57,11 +58,15 @@ class _Dataset:
 # path_settings
     @property
     def project_root_path(self) -> str:
-        return self._json_data["path_settings"]["root"]
+        return self._json_data["path_settings"]["root_dir"]
 
     @property
-    def project_ignored_dir_names(self) -> list[str]:
-        return self._json_data["path_settings"]["ignore"]
+    def project_include_dir_names(self) -> str:
+        return self._json_data["path_settings"]["include_dirs"]
+
+    @property
+    def project_source_ignored_dir_names(self) -> list[str]:
+        return self._json_data["path_settings"]["source_dirs_ignore"]
 
     @property
     def project_imported_static_libs(self) -> list[tuple[str, str]]:
@@ -179,7 +184,7 @@ class ImplementationSharedState:
         """
         self._check_initialization()
         cmake.generate( project_root_path=self._dataset.project_root_path,
-                        project_ignored_dir_names=self._dataset.project_ignored_dir_names,
+                        project_source_ignored_dir_names=self._dataset.project_source_ignored_dir_names,
                         project_imported_static_libs=self._dataset.project_imported_static_libs,
                         project_imported_shared_libs=self._dataset.project_imported_shared_libs,
                         project_name=self._dataset.project_name,
