@@ -3,7 +3,6 @@ import os
 
 __all__ = ["get_cmakelists_file_path",
            "get_build_dir_path",
-           "get_install_dir_path",
            "get_project_files_and_dirs"
            ]
 
@@ -13,7 +12,6 @@ _SOURCE_EXTENSIONS = (".c", ".cpp")
 _HEADER_EXTENSIONS = (".h", ".hpp")
 _CMAKELISTS_FILE_NAME = "CMakeLists.txt"
 _PROJECT_BUILD_DIR_NAME = "build"
-_PROJECT_INSTALL_DIR_NAME = "install"
 
 
 # ==========================================================================================================================
@@ -34,14 +32,6 @@ def get_build_dir_path(project_root_path: str) -> str:
     :returns str: full path to the build directory
     """
     return os.path.join(project_root_path, _PROJECT_BUILD_DIR_NAME)
-
-
-def get_install_dir_path(project_root_path: str) -> str:
-    """
-    :param project_root_path: full path to the project
-    :returns str: full path to the install directory
-    """
-    return os.path.join(project_root_path, _PROJECT_INSTALL_DIR_NAME)
 
 
 def get_project_files_and_dirs(dir_path: str, ignored_dirs: list[str]) -> tuple[list[str], list[str], str | None]:

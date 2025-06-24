@@ -209,16 +209,6 @@ class ImplementationSharedState:
                     ninja_bin_path=self._ninja_bin_path,
         )
 
-    def install_project(self) -> None:
-        """
-        Check if json data was parsed and apply cmd commands for cmake install
-        """
-        self._check_initialization()
-        cmake.install(project_root_path=self._dataset.project_root_path,
-                      cmake_bin_path=self._cmake_bin_path,
-                      ninja_bin_path=self._ninja_bin_path,
-        )
-
     def _check_initialization(self) -> None:
         if not self.is_initialized():
             raise RuntimeError("Shared state has not been initialized. Call initialize() first.")

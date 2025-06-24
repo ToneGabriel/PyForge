@@ -20,7 +20,6 @@ def main(json_path: str,
     main_menu.add_option("Reload Manifest", impl_state.reload)
     main_menu.add_option("Configure Project", impl_state.configure_project)
     main_menu.add_option("Build Project", impl_state.build_project)
-    main_menu.add_option("Install Project", impl_state.install_project)
     main_menu.add_option("Exit", None)
     main_menu.run()
 

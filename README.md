@@ -11,10 +11,10 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
 0. Install using `pyforge-setup.exe`
 1. Modify the `manifest.JSON` configuration file to customize compiler paths and project settings. Ensure the selected compiler supports the specified settings.
 2. Start PyForge with `pyforge.exe`
-3. Select `Reload` to load manifest data if you changed it during run.
+3. Select `Reload Manifest` to load manifest data if you changed it during run.
 4. Create you project files. Can create any subfolder structure.
-5. Select `Generate CMakeLists` to setup the build process.
-6. Select `Build Project` or `Build Project Clean` to build the project (output files are available in project `build` folder).
+5. Select `Configure Project` to setup the build process (if project files have changed).
+6. Select `Build Project` to build the project (output files are available in project `build` folder).
 7. Select `Exit` to stop PyForge.
 
 ## Configuration Details
