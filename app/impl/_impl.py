@@ -70,11 +70,11 @@ class _Dataset:
 
     @property
     def project_imported_static_libs(self) -> list[tuple[str, str]]:
-        return self._json_data["path_settings"]["import"]["static"]
+        return self._json_data["path_settings"]["imports"]["static"]
 
     @property
     def project_imported_shared_libs(self) -> list[tuple[str, str, str]]:
-        return self._json_data["path_settings"]["import"]["shared"]
+        return self._json_data["path_settings"]["imports"]["shared"]
 
 # project_settings
     @property
@@ -87,14 +87,6 @@ class _Dataset:
                 f"{self._json_data["project_settings"]["version"]["minor"]}."
                 f"{self._json_data["project_settings"]["version"]["patch"]}"
                 )
-
-    @property
-    def include_dir_name(self) -> str:
-        return self._json_data["project_settings"]["include_dir_name"]
-
-    @property
-    def source_dir_name(self) -> str:
-        return self._json_data["project_settings"]["source_dir_name"]
 
     @property
     def project_language(self) -> cmake.Language:
@@ -184,6 +176,7 @@ class ImplementationSharedState:
         """
         self._check_initialization()
         cmake.generate( project_root_path=self._dataset.project_root_path,
+                        project_include_dir_names=self._dataset.project_include_dir_names,
                         project_source_ignored_dir_names=self._dataset.project_source_ignored_dir_names,
                         project_imported_static_libs=self._dataset.project_imported_static_libs,
                         project_imported_shared_libs=self._dataset.project_imported_shared_libs,

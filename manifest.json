@@ -13,14 +13,14 @@
         {
             "static":
             [
-                ["relative\\path\\to\\library1\\implementation\\.lib_.a", "relative\\path\\to\\library1\\include"],
-                ["relative\\path\\to\\library2\\implementation\\.lib_.a", "relative\\path\\to\\library2\\include"]
+                ["relative\\path\\to\\library1\\.lib_.a", "relative\\path\\to\\library1\\include"],
+                ["relative\\path\\to\\library2\\.lib_.a", "relative\\path\\to\\library2\\include"]
             ],
 
             "shared":
             [
-                ["relative\\path\\to\\library1\\.dll", "relative\\path\\to\\library1\\implementation\\.lib_.a", "relative\\path\\to\\library1\\include"],
-                ["relative\\path\\to\\library2\\.dll", "relative\\path\\to\\library2\\implementation\\.lib_.a", "relative\\path\\to\\library2\\include"]
+                ["relative\\path\\to\\library1\\.dll", "relative\\path\\to\\implementation_library1\\.lib_.a", "relative\\path\\to\\library1\\include"],
+                ["relative\\path\\to\\library2\\.dll", "relative\\path\\to\\implementation_library2\\.lib_.a", "relative\\path\\to\\library2\\include"]
             ]
         }
     },
