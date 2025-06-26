@@ -22,6 +22,7 @@ class _Option:
         :param args: Option function bound arguments
         :raises TypeError: if action not callable. (Can be None)
         """
+
         self._label: str = label
         self._action: partial = partial(action, *args) if action else None
 
@@ -29,14 +30,12 @@ class _Option:
     def label(self) -> str:
         return self._label
 
+    @property
+    def action(self) -> Callable:
+        return self._action
+
     def empty(self) -> bool:
         return self._action is None
-
-    def run(self) -> None:
-        if self.empty():
-            return
-
-        self._action()
 
 
 # ==========================================================================================================================
@@ -57,6 +56,7 @@ class OptionsMenu:
         """
         :param text: Text to be shown as table title
         """
+
         self._header_text = text
 
     def add_option(self, label: str, action: Callable, *args) -> None:
@@ -67,6 +67,7 @@ class OptionsMenu:
         :param action: Option function
         :param args: Option function bound arguments
         """
+
         self._options[self._count] = _Option(label, action, *args)
         self._count += 1
 
@@ -77,12 +78,13 @@ class OptionsMenu:
 
         MAIN_CONSOLE = Console()
         MENU_TABLE = self._build_menu_table()
+        MENU_CHOICE_LIST = [str(i) for i in range(1, self._count)]
 
         while True:
             MAIN_CONSOLE.clear()
             MAIN_CONSOLE.print(MENU_TABLE)
 
-            choice_index = int(Prompt.ask("Please enter your choice", choices=[str(i) for i in range(1, self._count)]))
+            choice_index = int(Prompt.ask("Please enter your choice", choices=MENU_CHOICE_LIST))
             selected_option = self._options[choice_index]
 
             # no function available at option (exit loop)
@@ -93,7 +95,7 @@ class OptionsMenu:
             MAIN_CONSOLE.print(f"Executing: {selected_option.label}...", style="yellow")
 
             try:
-                selected_option.run()
+                selected_option.action()
             except Exception as e:
                 MAIN_CONSOLE.print(f"Operation failed: {e}", style="red")
             else:

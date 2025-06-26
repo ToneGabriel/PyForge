@@ -35,6 +35,7 @@ class GeneratorBuilder:
     ) -> None:
         """
         Append Header part to generator
+
         :param cmake_minimum_required_version: str with minimum cmake version (format: major.minor.patch)
         :param project_name: str with project name
         :param project_version: str with project version (format: major.minor.patch)
@@ -43,6 +44,7 @@ class GeneratorBuilder:
         :param language_standard_required: `False` to use lower standard
         :param compiler_extensions_required: `True` to use optional compiler specific extensions
         """
+
         part = HeaderGeneratorPart(cmake_minimum_required_version,
                                    project_name,
                                    project_version,
@@ -65,6 +67,7 @@ class GeneratorBuilder:
         :returns str: cmake variable name for the newly created library
         (used in `add_target_include_directories`, `add_target_sources`, `add_target_compile_definitions`, `add_target_linker`)
         """
+
         part = LibraryGeneratorPart(name, type)
         self._generator.add_part(part)
         return part.cmake_variable_name
@@ -121,6 +124,7 @@ class GeneratorBuilder:
         :param visibility: cmake forward visibility
         :param include_directories: list of relative paths to header directories
         """
+
         part = IncludeGeneratorPart(cmake_target_var_name, visibility, include_directories)
         self._generator.add_part(part)
 
@@ -164,9 +168,9 @@ class GeneratorBuilder:
         """
         Append Linker part to generator
 
-        :param cmake_target_var_name: the cmake variable name to be linked onto (created by add_library, add_imported_library, add_executable)
+        :param cmake_target_var_name: the cmake variable name to be linked onto (created by `add_library`, `add_imported_library`, `add_executable`)
         :param visibility: cmake forward visibility
-        :param cmake_lib_var_names: the cmake variable names to be linked to the first param (created by add_library, add_imported_library)
+        :param cmake_lib_var_names: the cmake variable names to be linked to the first param (created by `add_library`, `add_imported_library`)
         """
 
         part = LinkerGeneratorPart(cmake_target_var_name, visibility, *cmake_lib_var_names)

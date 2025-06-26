@@ -117,6 +117,10 @@ def configure(project_root_path: str,
               cmake_bin_path: str,
               ninja_bin_path: str
 ) -> None:
+    """
+    Run commands in console for cmake configuration process
+    """
+
     build_dir_path = devfiles.get_build_dir_path(project_root_path)
 
     builder = CMDBuilder(cmake_bin_path, ninja_bin_path)

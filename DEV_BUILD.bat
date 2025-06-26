@@ -9,7 +9,7 @@ for /f "tokens=2 delims=::" %%a in ('DEV_VENV.bat ^| findstr "::RETURN::"') do (
 :: Build PyForge
 :: ===============================================
 
-set DEST_PATH=./.pyinstaller.out
+set DEST_PATH=./.build
 set NAME_FLAG=--name=pyforge
 set DIST_FLAG=--distpath %DEST_PATH%/dist
 set WORK_FLAG=--workpath %DEST_PATH%/build
@@ -21,7 +21,7 @@ echo [INFO] Activating environment and running build...
 
 call !VENV_DIR!\Scripts\activate
 
-pyinstaller --onefile %NAME_FLAG% %DIST_FLAG% %WORK_FLAG% %SPEC_FLAG% %TARGET_PATH%
+pyinstaller --onedir %NAME_FLAG% %DIST_FLAG% %WORK_FLAG% %SPEC_FLAG% %TARGET_PATH%
 
 call !VENV_DIR!\Scripts\deactivate
 

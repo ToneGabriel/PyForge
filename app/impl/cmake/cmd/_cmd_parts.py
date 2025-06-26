@@ -40,6 +40,7 @@ class CMakeGeneratePart(ICMDPart):
         :param c_compiler_path: full path to C compiler exe
         :param cpp_compiler_path: full path to C++ compiler exe
         """
+
         self._cmakelists_root_dir_path = cmakelists_root_dir_path
         self._build_type = build_type
         self._build_dir_path = build_dir_path
@@ -75,6 +76,7 @@ class CMakeBuildPart(ICMDPart):
         Create cmake build command to append to cmd list
         :param build_dir_path: full path to build directory
         """
+
         self._build_dir_path = build_dir_path
 
     @override
@@ -95,6 +97,7 @@ class RMDIRPart(ICMDPart):
         Create rmdir command to append to cmd list
         :param dir_path: full path to directory to remove
         """
+
         self._dir_path = dir_path
 
     @override

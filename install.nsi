@@ -39,15 +39,18 @@ Section "Core Files" SEC01
   SectionIn RO  ; always selected
 
   SetOutPath $INSTDIR\deps
+  SetOverwrite off
   File /r .\deps\*.*
 
   SetOutPath $INSTDIR
-  File .\.pyinstaller.out\dist\pyforge.exe  ; created by pyinstaller
+  SetOverwrite on
+  File /r .\.build\dist\pyforge\*.*  ; created by pyinstaller
   File .\manifest.json
 SectionEnd
 
 Section "Readme" SEC02
   SetOutPath $INSTDIR
+  SetOverwrite on
   File .\README.md
 SectionEnd
 

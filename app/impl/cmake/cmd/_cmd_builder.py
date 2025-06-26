@@ -38,6 +38,7 @@ class CMDBuilder:
         :param c_compiler_path: full path to C compiler exe
         :param cpp_compiler_path: full path to C++ compiler exe
         """
+
         part = CMakeGeneratePart(cmakelists_root_dir_path,
                                  build_type,
                                  build_dir_path,
@@ -53,6 +54,7 @@ class CMDBuilder:
         Append cmake build command to cmd list
         :param build_dir_path: full path to build directory
         """
+
         part = CMakeBuildPart(build_dir_path)
         self._cmd_list.add_part(part)
 
@@ -63,5 +65,6 @@ class CMDBuilder:
         Append rmdir command to cmd list
         :param dir_path: full path to directory to remove
         """
+
         part = RMDIRPart(dir_path)
         self._cmd_list.add_part(part)
