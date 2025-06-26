@@ -5,6 +5,13 @@ from ._cmd_base import ICMDPart, override
 # Implemented ALL generator parts (as ICMDPart)
 
 
+__all__ = ["BuildType",
+           "CMakeGeneratePart",
+           "CMakeBuildPart",
+           "RMDIRPart"
+           ]
+
+
 class BuildType(Enum):
     DEBUGG = "Debugg"
     RELEASE = "Release"
@@ -33,6 +40,7 @@ class CMakeGeneratePart(ICMDPart):
         :param c_compiler_path: full path to C compiler exe
         :param cpp_compiler_path: full path to C++ compiler exe
         """
+
         self._cmakelists_root_dir_path = cmakelists_root_dir_path
         self._build_type = build_type
         self._build_dir_path = build_dir_path
@@ -68,6 +76,7 @@ class CMakeBuildPart(ICMDPart):
         Create cmake build command to append to cmd list
         :param build_dir_path: full path to build directory
         """
+
         self._build_dir_path = build_dir_path
 
     @override
@@ -80,17 +89,18 @@ class CMakeBuildPart(ICMDPart):
 # ==========================================================================================================================
 
 
-class CMakeBuildClearPart(ICMDPart):
+class RMDIRPart(ICMDPart):
     def __init__(self,
-                 build_dir_path: str
+                 dir_path: str
     ):
         """
-        Create cmake build rmdir command to append to cmd list
-        :param build_dir_path: full path to build directory to remove
+        Create rmdir command to append to cmd list
+        :param dir_path: full path to directory to remove
         """
-        self._build_dir_path = build_dir_path
+
+        self._dir_path = dir_path
 
     @override
     def get_cmd_text(self) -> str:
-        ret = f"if exist \"{self._build_dir_path}\" rmdir /s /q \"{self._build_dir_path}\""
+        ret = f"if exist \"{self._dir_path}\" rmdir /s /q \"{self._dir_path}\""
         return ret

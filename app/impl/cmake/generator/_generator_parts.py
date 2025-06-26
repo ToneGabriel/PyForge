@@ -226,7 +226,7 @@ class ExecutableGeneratorPart(IGeneratorPart):
     def __init__(
             self,
             name: str,
-            executable_file: str
+            executable_file: str=None
     ):
         """
         Create Executable part to append to generator
@@ -247,8 +247,10 @@ class ExecutableGeneratorPart(IGeneratorPart):
         self._write_executable_header(file)
 
     def _write_executable_header(self, file) -> None:
+        exe_file_output = f" ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._executable_file)}" if self._executable_file else ""
+
         file.write( f"set({self.cmake_variable_name} {self._name})\n"
-                    f"add_executable(${{{self.cmake_variable_name}}} ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._executable_file)})\n\n"
+                    f"add_executable(${{{self.cmake_variable_name}}}{exe_file_output})\n\n"
                     )
 
 

@@ -1,8 +1,5 @@
 from ._cmd_base import CMDList
-from ._cmd_parts import CMakeGeneratePart,\
-                        CMakeBuildPart,\
-                        CMakeBuildClearPart,\
-                        BuildType
+from ._cmd_parts import *
 
 
 __all__ = ["CMDBuilder",
@@ -41,6 +38,7 @@ class CMDBuilder:
         :param c_compiler_path: full path to C compiler exe
         :param cpp_compiler_path: full path to C++ compiler exe
         """
+
         part = CMakeGeneratePart(cmakelists_root_dir_path,
                                  build_type,
                                  build_dir_path,
@@ -56,15 +54,17 @@ class CMDBuilder:
         Append cmake build command to cmd list
         :param build_dir_path: full path to build directory
         """
+
         part = CMakeBuildPart(build_dir_path)
         self._cmd_list.add_part(part)
 
-    def add_cmake_build_clear_part(self,
-                                   build_dir_path: str
+    def add_rmdir_part(self,
+                       dir_path: str
     ) -> None:
         """
-        Append cmake build rmdir command to cmd list
-        :param build_dir_path: full path to build directory to remove
+        Append rmdir command to cmd list
+        :param dir_path: full path to directory to remove
         """
-        part = CMakeBuildClearPart(build_dir_path)
+
+        part = RMDIRPart(dir_path)
         self._cmd_list.add_part(part)

@@ -9,6 +9,7 @@ __all__ = ["ProductType",
            "BuildType",
            "Language",
            "generate",
+           "configure",
            "build"
            ]
 
@@ -36,7 +37,8 @@ class ProductType(Enum):
 
 def generate(
         project_root_path: str,
-        project_ignored_dir_names: list[str],
+        project_include_dir_names: list[str],
+        project_source_ignored_dir_names: list[str],
         project_imported_static_libs: list[tuple[str, str]],
         project_imported_shared_libs: list[tuple[str, str, str]],
         project_name: str,
@@ -53,7 +55,7 @@ def generate(
         """
 
         cmakelists_path = devfiles.get_cmakelists_file_path(project_root_path)
-        include_directories, source_files, executable_file = devfiles.get_project_files_and_dirs(project_root_path, project_ignored_dir_names)
+        project_source_files = devfiles.get_project_source_files(project_root_path, project_source_ignored_dir_names)
 
         builder = GeneratorBuilder()
 
@@ -74,7 +76,7 @@ def generate(
         # create target based on product type
         match project_product_type:
             case ProductType.EXE:
-                cmake_target_var_name = builder.add_executable(project_name, executable_file)
+                cmake_target_var_name = builder.add_executable(project_name)
 
             case ProductType.LIB:
                 cmake_target_var_name = builder.add_library(project_name, CMakeLibraryType.STATIC)
@@ -86,8 +88,8 @@ def generate(
                 raise RuntimeError(f"Project product type not implemented: {project_product_type}")
 
         # add include, source and compile definitions to target
-        builder.add_target_include_directories(cmake_target_var_name, CMakeTargetVisibility.PUBLIC, include_directories)
-        builder.add_target_sources(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, source_files)
+        builder.add_target_include_directories(cmake_target_var_name, CMakeTargetVisibility.PUBLIC, project_include_dir_names)
+        builder.add_target_sources(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, project_source_files)
         builder.add_target_compile_definitions(cmake_target_var_name, CMakeTargetVisibility.PRIVATE, cmake_compile_definitions)
 
         # create static imported libraries
@@ -108,14 +110,35 @@ def generate(
             builder.generator_product.run(cmakelists_root_open_file)
 
 
+def configure(project_root_path: str,
+              project_build_type: BuildType,
+              c_compiler_path: str,
+              cpp_compiler_path: str,
+              cmake_bin_path: str,
+              ninja_bin_path: str
+) -> None:
+    """
+    Run commands in console for cmake configuration process
+    """
+
+    build_dir_path = devfiles.get_build_dir_path(project_root_path)
+
+    builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
+
+    builder.add_rmdir_part(build_dir_path)
+    builder.add_cmake_generate_part(project_root_path,
+                                    project_build_type,
+                                    build_dir_path,
+                                    c_compiler_path,
+                                    cpp_compiler_path
+                                    )
+    builder.cmd_product.run()
+
+
 def build(
         project_root_path: str,
-        project_build_type: BuildType,
-        c_compiler_path: str,
-        cpp_compiler_path: str,
         cmake_bin_path: str,
         ninja_bin_path: str,
-        clean: bool=True
 ) -> None:
     """
     Run commands in console for cmake build
@@ -125,16 +148,5 @@ def build(
 
     builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
 
-    if clean:
-        builder.add_cmake_build_clear_part(build_dir_path)
-
-    builder.add_cmake_generate_part(project_root_path,
-                                    project_build_type,
-                                    build_dir_path,
-                                    c_compiler_path,
-                                    cpp_compiler_path
-                                    )
-
     builder.add_cmake_build_part(build_dir_path)
-
     builder.cmd_product.run()

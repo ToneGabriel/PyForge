@@ -8,9 +8,10 @@ __all__ = ["ImplementationSharedState"]
 _EXPECTED_JSON_STRUCTURE = {
     "path_settings":
     {
-        "root": str,
-        "ignore": list,
-        "import":
+        "root_dir": str,
+        "include_dirs": list,
+        "source_dirs_ignore": list,
+        "imports":
         {
             "static": list,
             "shared": list
@@ -57,19 +58,23 @@ class _Dataset:
 # path_settings
     @property
     def project_root_path(self) -> str:
-        return self._json_data["path_settings"]["root"]
+        return self._json_data["path_settings"]["root_dir"]
 
     @property
-    def project_ignored_dir_names(self) -> list[str]:
-        return self._json_data["path_settings"]["ignore"]
+    def project_include_dir_names(self) -> str:
+        return self._json_data["path_settings"]["include_dirs"]
+
+    @property
+    def project_source_ignored_dir_names(self) -> list[str]:
+        return self._json_data["path_settings"]["source_dirs_ignore"]
 
     @property
     def project_imported_static_libs(self) -> list[tuple[str, str]]:
-        return self._json_data["path_settings"]["import"]["static"]
+        return self._json_data["path_settings"]["imports"]["static"]
 
     @property
     def project_imported_shared_libs(self) -> list[tuple[str, str, str]]:
-        return self._json_data["path_settings"]["import"]["shared"]
+        return self._json_data["path_settings"]["imports"]["shared"]
 
 # project_settings
     @property
@@ -82,14 +87,6 @@ class _Dataset:
                 f"{self._json_data["project_settings"]["version"]["minor"]}."
                 f"{self._json_data["project_settings"]["version"]["patch"]}"
                 )
-
-    @property
-    def include_dir_name(self) -> str:
-        return self._json_data["project_settings"]["include_dir_name"]
-
-    @property
-    def source_dir_name(self) -> str:
-        return self._json_data["project_settings"]["source_dir_name"]
 
     @property
     def project_language(self) -> cmake.Language:
@@ -173,13 +170,14 @@ class ImplementationSharedState:
         self._check_initialization()
         self._dataset = _Dataset(self._json_path)
 
-    def generate_cmakelists(self) -> None:
+    def configure_project(self) -> None:
         """
-        Check if json data was parsed and generate CMakelists.txt file
+        Check if json data was parsed, generate CMakelists.txt file and run cmake configuration
         """
         self._check_initialization()
         cmake.generate( project_root_path=self._dataset.project_root_path,
-                        project_ignored_dir_names=self._dataset.project_ignored_dir_names,
+                        project_include_dir_names=self._dataset.project_include_dir_names,
+                        project_source_ignored_dir_names=self._dataset.project_source_ignored_dir_names,
                         project_imported_static_libs=self._dataset.project_imported_static_libs,
                         project_imported_shared_libs=self._dataset.project_imported_shared_libs,
                         project_name=self._dataset.project_name,
@@ -191,19 +189,22 @@ class ImplementationSharedState:
                         compiler_extensions_required=self._dataset.compiler_extensions_required,
                         cmake_compile_definitions=self._dataset.cmake_compile_definitions
         )
+        cmake.configure(project_root_path=self._dataset.project_root_path,
+                        project_build_type=self._dataset.project_build_type,
+                        c_compiler_path=self._dataset.compiler_path,
+                        cpp_compiler_path=self._dataset.compiler_path,
+                        cmake_bin_path=self._cmake_bin_path,
+                        ninja_bin_path=self._ninja_bin_path,
+        )
 
-    def build_project(self, clean: bool=False) -> None:
+    def build_project(self) -> None:
         """
         Check if json data was parsed and apply cmd commands for cmake build
         """
         self._check_initialization()
         cmake.build(project_root_path=self._dataset.project_root_path,
-                    project_build_type=self._dataset.project_build_type,
-                    c_compiler_path=self._dataset.compiler_path,
-                    cpp_compiler_path=self._dataset.compiler_path,
                     cmake_bin_path=self._cmake_bin_path,
                     ninja_bin_path=self._ninja_bin_path,
-                    clean=clean
         )
 
     def _check_initialization(self) -> None:
