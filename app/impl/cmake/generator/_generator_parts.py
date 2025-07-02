@@ -84,6 +84,7 @@ class HeaderGeneratorPart(IGeneratorPart):
     ):
         """
         Create Header part to append to generator
+
         :param cmake_minimum_required_version: str with minimum cmake version (format: major.minor.patch)
         :param project_name: str with project name
         :param project_version: str with project version (format: major.minor.patch)
