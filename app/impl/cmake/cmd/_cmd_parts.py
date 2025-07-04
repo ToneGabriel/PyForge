@@ -106,5 +106,5 @@ class RemoveDirectoryPart(ICMDPart):
         if platform.system() == "Windows":
             ret = f"if exist \"{self._dir_path}\" rmdir /s /q \"{self._dir_path}\""
         elif platform.system() == "Linux":
-            ret = f"[-d \"{self._dir_path}\"] && rm -rf \"{self._dir_path}\""
+            ret = f"if [ -d \"{self._dir_path}\" ]; then rm -rf \"{self._dir_path}\"; fi"
         return ret
