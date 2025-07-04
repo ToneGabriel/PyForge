@@ -1,3 +1,4 @@
+import platform
 from enum import Enum
 from ._cmd_base import ICMDPart, override
 
@@ -8,7 +9,7 @@ from ._cmd_base import ICMDPart, override
 __all__ = ["BuildType",
            "CMakeGeneratePart",
            "CMakeBuildPart",
-           "RMDIRPart"
+           "RemoveDirectoryPart"
            ]
 
 
@@ -89,7 +90,7 @@ class CMakeBuildPart(ICMDPart):
 # ==========================================================================================================================
 
 
-class RMDIRPart(ICMDPart):
+class RemoveDirectoryPart(ICMDPart):
     def __init__(self,
                  dir_path: str
     ):
@@ -102,5 +103,8 @@ class RMDIRPart(ICMDPart):
 
     @override
     def get_cmd_text(self) -> str:
-        ret = f"if exist \"{self._dir_path}\" rmdir /s /q \"{self._dir_path}\""
+        if platform.system() == "Windows":
+            ret = f"if exist \"{self._dir_path}\" rmdir /s /q \"{self._dir_path}\""
+        elif platform.system() == "Linux":
+            ret = f"[-d \"{self._dir_path}\"] && rm -rf \"{self._dir_path}\""
         return ret

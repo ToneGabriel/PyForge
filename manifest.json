@@ -1,11 +1,11 @@
 {
     "path_settings":
     {
-        "root_dir": "full\\path\\to\\your\\project\\root\\folder",
+        "root_dir": "full/path/to/your/project/root/folder",
         "include_dirs":
         [
-            "relative\\path\\to\\include\\folder_1",
-            "relative\\path\\to\\include\\folder_2"
+            "relative/path/to/include/folder_1",
+            "relative/path/to/include/folder_2"
         ],
         "source_dirs_ignore": [".git", "build", "config", "extern", "import", "test"],
 
@@ -13,14 +13,14 @@
         {
             "static":
             [
-                ["relative\\path\\to\\library1\\.lib_.a", "relative\\path\\to\\library1\\include"],
-                ["relative\\path\\to\\library2\\.lib_.a", "relative\\path\\to\\library2\\include"]
+                ["relative/path/to/library1/.lib_.a", "relative/path/to/library1/include"],
+                ["relative/path/to/library2/.lib_.a", "relative/path/to/library2/include"]
             ],
 
             "shared":
             [
-                ["relative\\path\\to\\library1\\.dll", "relative\\path\\to\\implementation_library1\\.lib_.a", "relative\\path\\to\\library1\\include"],
-                ["relative\\path\\to\\library2\\.dll", "relative\\path\\to\\implementation_library2\\.lib_.a", "relative\\path\\to\\library2\\include"]
+                ["relative/path/to/library1/.dll", "relative/path/to/implementation_library1/.lib_.a", "relative/path/to/library1/include"],
+                ["relative/path/to/library2/.dll", "relative/path/to/implementation_library2/.lib_.a", "relative/path/to/library2/include"]
             ]
         }
     },
@@ -48,7 +48,7 @@
 
     "compiler_settings":
     {
-        "compiler_path": "leave_empty_or_full\\path\\to\\your\\c_cpp\\compiler\\.exe",
+        "compiler_path": "leave_empty_or_full/path/to/your/c_cpp/compiler/.exe",
         "compiler_extensions_required": false,
         "language_standard": 20,
         "language_standard_required": true

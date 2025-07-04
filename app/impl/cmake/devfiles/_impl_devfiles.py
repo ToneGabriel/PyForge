@@ -7,8 +7,7 @@ __all__ = ["get_cmakelists_file_path",
            ]
 
 
-_MAIN_FILE_NAMES = ("main.c", "main.cpp")
-_SOURCE_EXTENSIONS = (".c", ".cpp")
+_SOURCE_EXTENSIONS = (".c", ".cpp", ".cxx", ".cc")
 _CMAKELISTS_FILE_NAME = "CMakeLists.txt"
 _PROJECT_BUILD_DIR_NAME = "build"
 
@@ -22,7 +21,7 @@ def get_cmakelists_file_path(project_root_path: str) -> str:
     :param project_root_path: full path to the project
     :returns str: full path to the CMakelists.txt file
     """
-    return os.path.join(project_root_path, _CMAKELISTS_FILE_NAME)
+    return os.path.join(project_root_path, _CMAKELISTS_FILE_NAME).replace("\\", "/")
 
 
 def get_build_dir_path(project_root_path: str) -> str:
@@ -30,7 +29,7 @@ def get_build_dir_path(project_root_path: str) -> str:
     :param project_root_path: full path to the project
     :returns str: full path to the build directory
     """
-    return os.path.join(project_root_path, _PROJECT_BUILD_DIR_NAME)
+    return os.path.join(project_root_path, _PROJECT_BUILD_DIR_NAME).replace("\\", "/")
 
 
 def get_project_source_files(dir_path: str, ignored_dirs: list[str]) -> list[str]:
@@ -50,8 +49,7 @@ def get_project_source_files(dir_path: str, ignored_dirs: list[str]) -> list[str
 
         for filename in current_dir_filenames:
             if filename.endswith(_SOURCE_EXTENSIONS):
-                relative_path = os.path.relpath(path=os.path.join(current_dir_path, filename),
-                                                start=dir_path)
+                relative_path = os.path.relpath(path=os.path.join(current_dir_path, filename), start=dir_path).replace("\\", "/")
                 src_files.append(relative_path)
             else:
                 # ignore any other files
