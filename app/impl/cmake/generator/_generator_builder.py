@@ -25,7 +25,6 @@ class GeneratorBuilder:
         self._generator = Generator()
 
     def add_header(self,
-                   cmake_minimum_required_version: str,
                    project_name: str,
                    project_version: str,
                    project_language: Language,
@@ -36,7 +35,6 @@ class GeneratorBuilder:
         """
         Append Header part to generator
 
-        :param cmake_minimum_required_version: str with minimum cmake version (format: major.minor.patch)
         :param project_name: str with project name
         :param project_version: str with project version (format: major.minor.patch)
         :param project_language: language C or CPP
@@ -45,8 +43,7 @@ class GeneratorBuilder:
         :param compiler_extensions_required: `True` to use optional compiler specific extensions
         """
 
-        part = HeaderGeneratorPart(cmake_minimum_required_version,
-                                   project_name,
+        part = HeaderGeneratorPart(project_name,
                                    project_version,
                                    project_language,
                                    language_standard,

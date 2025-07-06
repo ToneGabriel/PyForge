@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from ._generator_base import IGeneratorPart, override
+from ._generator_base import IGeneratorPart
 
 
 # Implemented ALL generator parts (as IGeneratorPart)
@@ -68,9 +68,10 @@ _CPP_CMAKE_COMPILER_SETTINGS_NAMES = {
 
 
 class HeaderGeneratorPart(IGeneratorPart):
+    _CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
+
     def __init__(
             self,
-            cmake_minimum_required_version: str,
             project_name: str,
             project_version: str,
             project_language: Language,
@@ -81,7 +82,6 @@ class HeaderGeneratorPart(IGeneratorPart):
         """
         Create Header part to append to generator
 
-        :param cmake_minimum_required_version: str with minimum cmake version (format: major.minor.patch)
         :param project_name: str with project name
         :param project_version: str with project version (format: major.minor.patch)
         :param project_language: language C or CPP
@@ -90,7 +90,6 @@ class HeaderGeneratorPart(IGeneratorPart):
         :param compiler_extensions_required: `True` to use optional compiler specific extensions
         """
 
-        self._cmake_minimum_required_version = cmake_minimum_required_version
         self._project_name = project_name
         self._project_version = project_version
         self._project_language = project_language
@@ -98,7 +97,6 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._language_standard_required = language_standard_required
         self._compiler_extensions_required = compiler_extensions_required
 
-    @override
     def run(self, file) -> None:
         self._write_cmake_minimum_required_version(file)
         self._write_project_specifications(file)
@@ -106,7 +104,7 @@ class HeaderGeneratorPart(IGeneratorPart):
         self._write_destination_specifications(file)
 
     def _write_cmake_minimum_required_version(self, file) -> None:
-        file.write( f"cmake_minimum_required(VERSION {self._cmake_minimum_required_version} FATAL_ERROR)\n\n")
+        file.write( f"cmake_minimum_required(VERSION {HeaderGeneratorPart._CMAKE_MINIMUM_REQUIRED_VERSION} FATAL_ERROR)\n\n")
 
     def _write_project_specifications(self, file) -> None:
         file.write( f"project({self._project_name} "
@@ -117,10 +115,10 @@ class HeaderGeneratorPart(IGeneratorPart):
     def _write_language_specifications(self, file) -> None:
         cmake_compiler_settings_names_dict: dict[_COMPILER_SETTINGS_NAMES, str] = {}
 
-        if self._project_language == Language.C:
-            cmake_compiler_settings_names_dict = _C_CMAKE_COMPILER_SETTINGS_NAMES
-        else:
+        if self._project_language == Language.CPP:
             cmake_compiler_settings_names_dict = _CPP_CMAKE_COMPILER_SETTINGS_NAMES
+        else:
+            cmake_compiler_settings_names_dict = _C_CMAKE_COMPILER_SETTINGS_NAMES
 
         file.write( f"set({cmake_compiler_settings_names_dict[_COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD]} {self._language_standard})\n"
                     f"set({cmake_compiler_settings_names_dict[_COMPILER_SETTINGS_NAMES.LANGUAGE_STANDARD_REQUIRED]} {_adapt_to_cmake_bool(self._language_standard_required)})\n"
@@ -158,7 +156,6 @@ class LibraryGeneratorPart(IGeneratorPart):
     def cmake_variable_name(self) -> str:
         return self._name.upper() + "_LIB_NAME"
 
-    @override
     def run(self, file) -> None:
         self._write_library_header(file)
 
@@ -202,7 +199,6 @@ class ImportedLibraryGeneratorPart(IGeneratorPart):
     def cmake_variable_name(self) -> str:
         return self._name.upper() + "_LIB_NAME"
 
-    @override
     def run(self, file) -> None:
         self._write_library_header(file)
 
@@ -239,7 +235,6 @@ class ExecutableGeneratorPart(IGeneratorPart):
     def cmake_variable_name(self) -> str:
         return self._name.upper() + "_EXE_NAME"
 
-    @override
     def run(self, file) -> None:
         self._write_executable_header(file)
 
@@ -273,7 +268,6 @@ class IncludeGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._include_directories = include_directories
 
-    @override
     def run(self, file):
         self._write_target_include_directories(file)
 
@@ -309,7 +303,6 @@ class SourceGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._source_files = source_files
 
-    @override
     def run(self, file):
         self._write_target_sources(file)
 
@@ -345,7 +338,6 @@ class DefinitionGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._compile_definitions = compile_definitions
 
-    @override
     def run(self, file):
         self._write_target_compile_definitions(file)
 
@@ -385,7 +377,6 @@ class LinkerGeneratorPart(IGeneratorPart):
         self._visibility = visibility
         self._cmake_lib_var_names = cmake_lib_var_names
 
-    @override
     def run(self, file) -> None:
         self._write_target_link_libraries(file)
 

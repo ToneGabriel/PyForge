@@ -31,6 +31,15 @@ sleep 5
 echo
 echo "[INFO] Deploying build..."
 
-# TODO
+mkdir -p PyForge/deps
+
+# Copy deps
+cp -r deps/* PyForge/deps/
+
+# Copy PyInstaller output
+cp -r .build.linux/dist/pyforge/* PyForge/
+
+# Copy metadata files
+cp manifest.json README.md PyForge/
 
 sleep 10

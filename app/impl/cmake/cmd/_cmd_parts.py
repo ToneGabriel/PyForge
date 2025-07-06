@@ -1,6 +1,6 @@
 import platform
 from enum import Enum
-from ._cmd_base import ICMDPart, override
+from ._cmd_base import ICMDPart
 
 
 # Implemented ALL generator parts (as ICMDPart)
@@ -48,7 +48,6 @@ class CMakeGeneratePart(ICMDPart):
         self._c_compiler_path = c_compiler_path
         self._cpp_compiler_path = cpp_compiler_path
 
-    @override
     def get_cmd_text(self) -> str:
         ret = "cmake"
         ret += f" -S \"{self._cmakelists_root_dir_path}\""
@@ -80,7 +79,6 @@ class CMakeBuildPart(ICMDPart):
 
         self._build_dir_path = build_dir_path
 
-    @override
     def get_cmd_text(self) -> str:
         ret = f"cmake --build \"{self._build_dir_path}\""
         return ret
@@ -101,7 +99,6 @@ class RemoveDirectoryPart(ICMDPart):
 
         self._dir_path = dir_path
 
-    @override
     def get_cmd_text(self) -> str:
         if platform.system() == "Windows":
             ret = f"if exist \"{self._dir_path}\" rmdir /s /q \"{self._dir_path}\""

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import override
 
 
 # Implemented the CMakelists.txt text generator using the builder pattern
