@@ -9,8 +9,8 @@ _EXPECTED_JSON_STRUCTURE = {
     "path_settings":
     {
         "root_dir": str,
-        "include_dirs": list,
         "source_dirs_ignore": list,
+        "include_dirs": list,
         "imports":
         {
             "static": list,

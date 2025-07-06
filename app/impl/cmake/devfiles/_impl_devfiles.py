@@ -51,8 +51,6 @@ def get_project_source_files(dir_path: str, ignored_dirs: list[str]) -> list[str
             if filename.endswith(_SOURCE_EXTENSIONS):
                 relative_path = os.path.relpath(path=os.path.join(current_dir_path, filename), start=dir_path).replace("\\", "/")
                 src_files.append(relative_path)
-            else:
-                # ignore any other files
-                pass
+            # ignore any other files
 
     return src_files
