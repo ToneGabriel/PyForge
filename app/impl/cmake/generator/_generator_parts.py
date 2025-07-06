@@ -44,10 +44,6 @@ def _adapt_to_cmake_bool(value: bool) -> str:
     return "ON" if value else "OFF"
 
 
-def _adapt_to_cmake_path_separator(path: str) -> str:
-    return path.replace("\\", "/")
-
-
 class _COMPILER_SETTINGS_NAMES(Enum):
     LANGUAGE_STANDARD = auto()
     LANGUAGE_STANDARD_REQUIRED = auto()
@@ -84,6 +80,7 @@ class HeaderGeneratorPart(IGeneratorPart):
     ):
         """
         Create Header part to append to generator
+
         :param cmake_minimum_required_version: str with minimum cmake version (format: major.minor.patch)
         :param project_name: str with project name
         :param project_version: str with project version (format: major.minor.patch)
@@ -213,9 +210,9 @@ class ImportedLibraryGeneratorPart(IGeneratorPart):
         file.write( f"set({self.cmake_variable_name} {self._name})\n"
                     f"add_library(${{{self.cmake_variable_name}}} {self._type.value} IMPORTED)\n"
                     f"set_target_properties(${{{self.cmake_variable_name}}} PROPERTIES \n"
-                    f"IMPORTED_LOCATION ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._imported_location)}\n"
-                    f"IMPORTED_IMPLIB ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._imported_impl_location)}\n"
-                    f"INTERFACE_INCLUDE_DIRECTORIES ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._imported_include_dir)})\n\n")
+                    f"IMPORTED_LOCATION ${{CMAKE_SOURCE_DIR}}/{self._imported_location}\n"
+                    f"IMPORTED_IMPLIB ${{CMAKE_SOURCE_DIR}}/{self._imported_impl_location}\n"
+                    f"INTERFACE_INCLUDE_DIRECTORIES ${{CMAKE_SOURCE_DIR}}/{self._imported_include_dir})\n\n")
 
 
 # ==========================================================================================================================
@@ -247,7 +244,7 @@ class ExecutableGeneratorPart(IGeneratorPart):
         self._write_executable_header(file)
 
     def _write_executable_header(self, file) -> None:
-        exe_file_output = f" ${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(self._executable_file)}" if self._executable_file else ""
+        exe_file_output = f" ${{CMAKE_SOURCE_DIR}}/{self._executable_file}" if self._executable_file else ""
 
         file.write( f"set({self.cmake_variable_name} {self._name})\n"
                     f"add_executable(${{{self.cmake_variable_name}}}{exe_file_output})\n\n"
@@ -286,7 +283,7 @@ class IncludeGeneratorPart(IGeneratorPart):
 
         file.write(f"target_include_directories(${{{self._cmake_target_var_name}}} {self._visibility.value}\n")
         for dir in self._include_directories:
-            file.write(f"${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(dir)}\n")
+            file.write(f"${{CMAKE_SOURCE_DIR}}/{dir}\n")
         file.write(f")\n\n")
 
 
@@ -322,7 +319,7 @@ class SourceGeneratorPart(IGeneratorPart):
 
         file.write(f"target_sources(${{{self._cmake_target_var_name}}} {self._visibility.value}\n")
         for source in self._source_files:
-            file.write(f"${{CMAKE_SOURCE_DIR}}/{_adapt_to_cmake_path_separator(source)}\n")
+            file.write(f"${{CMAKE_SOURCE_DIR}}/{source}\n")
         file.write(f")\n\n")
 
 

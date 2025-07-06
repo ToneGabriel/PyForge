@@ -125,7 +125,7 @@ def configure(project_root_path: str,
 
     builder = CMDBuilder(cmake_bin_path, ninja_bin_path)
 
-    builder.add_rmdir_part(build_dir_path)
+    builder.add_remove_directory_part(build_dir_path)
     builder.add_cmake_generate_part(project_root_path,
                                     project_build_type,
                                     build_dir_path,

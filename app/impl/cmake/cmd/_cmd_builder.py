@@ -58,13 +58,13 @@ class CMDBuilder:
         part = CMakeBuildPart(build_dir_path)
         self._cmd_list.add_part(part)
 
-    def add_rmdir_part(self,
-                       dir_path: str
+    def add_remove_directory_part(self,
+                                  dir_path: str
     ) -> None:
         """
         Append rmdir command to cmd list
         :param dir_path: full path to directory to remove
         """
 
-        part = RMDIRPart(dir_path)
+        part = RemoveDirectoryPart(dir_path)
         self._cmd_list.add_part(part)

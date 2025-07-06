@@ -8,9 +8,14 @@ __pycache__/
 
 # Dependencies (cmake, ninja)
 deps
+deps.windows
+deps.linux
 
 # Distribution / packaging
 .Python
+.build
+.build.windows
+.build.linux
 build/
 develop-eggs/
 dist/
@@ -135,6 +140,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv.windows
+.venv.linux
 env/
 venv/
 ENV/
