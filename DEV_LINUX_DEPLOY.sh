@@ -11,6 +11,7 @@ NAME_FLAG="--name=pyforge"
 DIST_FLAG="--distpath ${DEST_PATH}/dist"
 WORK_FLAG="--workpath ${DEST_PATH}/build"
 SPEC_FLAG="--specpath ${DEST_PATH}"
+OTHERS_FLAG="--onedir --clean"
 TARGET_PATH="./app/__main__.py"
 
 echo
@@ -18,11 +19,11 @@ echo "[INFO] Activating environment and running build..."
 
 source "${VENV_DIR}/bin/activate"
 
-pyinstaller --onedir "$NAME_FLAG" $DIST_FLAG $WORK_FLAG $SPEC_FLAG "$TARGET_PATH"
+pyinstaller $NAME_FLAG $DIST_FLAG $WORK_FLAG $SPEC_FLAG $OTHERS_FLAG $TARGET_PATH
 
 deactivate
 
-sleep 5
+sleep 3
 
 # ===============================================
 # Deploy PyForge
@@ -34,7 +35,7 @@ echo "[INFO] Deploying build..."
 mkdir -p PyForge/deps
 
 # Copy deps
-cp -r deps/* PyForge/deps/
+cp -r deps.linux/* PyForge/deps/
 
 # Copy PyInstaller output
 cp -r .build.linux/dist/pyforge/* PyForge/
@@ -42,4 +43,7 @@ cp -r .build.linux/dist/pyforge/* PyForge/
 # Copy metadata files
 cp manifest.json README.md PyForge/
 
-sleep 10
+tar czvf PyForge.tar.gz PyForge/
+
+# To extract
+# tar xzvf PyForge.tar.gz

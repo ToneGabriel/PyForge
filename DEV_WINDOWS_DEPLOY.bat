@@ -10,6 +10,7 @@ set NAME_FLAG=--name=pyforge
 set DIST_FLAG=--distpath %DEST_PATH%/dist
 set WORK_FLAG=--workpath %DEST_PATH%/build
 set SPEC_FLAG=--specpath %DEST_PATH%
+set OTHERS_FLAG=--onedir --clean
 set TARGET_PATH=./app/__main__.py
 
 echo.
@@ -17,7 +18,7 @@ echo [INFO] Activating environment and running build...
 
 call %VENV_DIR%\Scripts\activate
 
-pyinstaller --onedir %NAME_FLAG% %DIST_FLAG% %WORK_FLAG% %SPEC_FLAG% %TARGET_PATH%
+pyinstaller %NAME_FLAG% %DIST_FLAG% %WORK_FLAG% %SPEC_FLAG% %OTHERS_FLAG% %TARGET_PATH%
 
 call %VENV_DIR%\Scripts\deactivate
 
@@ -32,4 +33,4 @@ echo [INFO] Deploying build...
 
 call makensis windows_install_config.nsi
 
-timeout /t 10
+timeout /t 5

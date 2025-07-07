@@ -40,7 +40,7 @@ Section "Core Files" SEC01
 
   SetOutPath $INSTDIR\deps
   SetOverwrite off
-  File /r .\deps\*.*
+  File /r .\deps.windows\*.*
 
   SetOutPath $INSTDIR
   SetOverwrite on

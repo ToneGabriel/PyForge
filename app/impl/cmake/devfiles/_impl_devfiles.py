@@ -38,7 +38,7 @@ def get_project_source_files(dir_path: str, ignored_dirs: list[str]) -> list[str
 
     :param dir_path: root directory of the tree
     :param ignored_dirs: name of the directories to ignore (recursive)
-    :returns list[str]: A list of relative paths to .c/.cpp files (excluding main files).
+    :returns list[str]: A list of relative paths to source files
     """
 
     src_files = []
