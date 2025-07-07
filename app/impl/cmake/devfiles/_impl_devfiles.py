@@ -38,7 +38,7 @@ def get_project_source_files(dir_path: str, ignored_dirs: list[str]) -> list[str
 
     :param dir_path: root directory of the tree
     :param ignored_dirs: name of the directories to ignore (recursive)
-    :returns list[str]: A list of relative paths to .c/.cpp files (excluding main files).
+    :returns list[str]: A list of relative paths to source files
     """
 
     src_files = []
@@ -51,8 +51,6 @@ def get_project_source_files(dir_path: str, ignored_dirs: list[str]) -> list[str
             if filename.endswith(_SOURCE_EXTENSIONS):
                 relative_path = os.path.relpath(path=os.path.join(current_dir_path, filename), start=dir_path).replace("\\", "/")
                 src_files.append(relative_path)
-            else:
-                # ignore any other files
-                pass
+            # ignore any other files
 
     return src_files

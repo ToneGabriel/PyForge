@@ -14,9 +14,6 @@ __all__ = ["ProductType",
            ]
 
 
-_CMAKE_MINIMUM_REQUIRED_VERSION = "3.22.1"
-
-
 def _get_next_library_name() -> str:
     """
     Generate sequential `import_lib` names
@@ -60,8 +57,7 @@ def generate(
         builder = GeneratorBuilder()
 
         # Header is the same for all cases
-        builder.add_header(_CMAKE_MINIMUM_REQUIRED_VERSION,
-                           project_name,
+        builder.add_header(project_name,
                            project_version,
                            project_language,
                            language_standard,

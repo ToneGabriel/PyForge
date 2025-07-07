@@ -29,7 +29,7 @@ This project is a C/C++ build automation tool powered by Python, leveraging CMak
         - **`string param 2`**: Relative path to the public API for the library (include)
     - **`shared`**: Declare a list of paths (leave empty if none):
         - **`string param 1`**: Relative path to the actual library (.dll)
-        - **`string param 2`**: Relative path to the library implementation (.lib, .a)
+        - **`string param 2`**: Relative path to the implementation library if any (.lib, .a), else leave empty
         - **`string param 3`**: Relative path to the public API for the library (include)
 
 ### project_settings

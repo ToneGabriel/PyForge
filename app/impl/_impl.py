@@ -6,11 +6,11 @@ __all__ = ["ImplementationSharedState"]
 
 
 _EXPECTED_JSON_STRUCTURE = {
-    "path_settings":
+    'path_settings':
     {
         "root_dir": str,
-        "include_dirs": list,
         "source_dirs_ignore": list,
+        "include_dirs": list,
         "imports":
         {
             "static": list,
@@ -58,71 +58,71 @@ class _Dataset:
 # path_settings
     @property
     def project_root_path(self) -> str:
-        return self._json_data["path_settings"]["root_dir"]
+        return self._json_data['path_settings']['root_dir']
 
     @property
     def project_include_dir_names(self) -> str:
-        return self._json_data["path_settings"]["include_dirs"]
+        return self._json_data['path_settings']['include_dirs']
 
     @property
     def project_source_ignored_dir_names(self) -> list[str]:
-        return self._json_data["path_settings"]["source_dirs_ignore"]
+        return self._json_data['path_settings']['source_dirs_ignore']
 
     @property
     def project_imported_static_libs(self) -> list[tuple[str, str]]:
-        return self._json_data["path_settings"]["imports"]["static"]
+        return self._json_data['path_settings']['imports']['static']
 
     @property
     def project_imported_shared_libs(self) -> list[tuple[str, str, str]]:
-        return self._json_data["path_settings"]["imports"]["shared"]
+        return self._json_data['path_settings']['imports']['shared']
 
 # project_settings
     @property
     def project_name(self) -> str:
-        return self._json_data["project_settings"]["name"]
+        return self._json_data['project_settings']['name']
 
     @property
     def project_version(self) -> str:
-        return (f"{self._json_data["project_settings"]["version"]["major"]}."
-                f"{self._json_data["project_settings"]["version"]["minor"]}."
-                f"{self._json_data["project_settings"]["version"]["patch"]}"
+        return (f"{self._json_data['project_settings']['version']['major']}."
+                f"{self._json_data['project_settings']['version']['minor']}."
+                f"{self._json_data['project_settings']['version']['patch']}"
                 )
 
     @property
     def project_language(self) -> cmake.Language:
         # [] for match by enum name
-        return cmake.Language[self._json_data["project_settings"]["language"]]
+        return cmake.Language[self._json_data['project_settings']['language']]
 
     @property
     def project_product_type(self) -> cmake.ProductType:
         # [] for match by enum name
-        return cmake.ProductType[self._json_data["project_settings"]["product"]]
+        return cmake.ProductType[self._json_data['project_settings']['product']]
 
     @property
     def project_build_type(self) -> cmake.BuildType:
         # [] for match by enum name
-        return cmake.BuildType[self._json_data["project_settings"]["build"]]
+        return cmake.BuildType[self._json_data['project_settings']['build']]
 
     @property
     def cmake_compile_definitions(self) -> list[tuple[str, str]]:
-        return self._json_data["project_settings"]["compile_definitions"]
+        return self._json_data['project_settings']['compile_definitions']
 
 # compiler_settings
     @property
     def compiler_path(self) -> str:
-        return self._json_data["compiler_settings"]["compiler_path"]
+        return self._json_data['compiler_settings']['compiler_path']
 
     @property
     def compiler_extensions_required(self) -> bool:
-        return self._json_data["compiler_settings"]["compiler_extensions_required"]
+        return self._json_data['compiler_settings']['compiler_extensions_required']
 
     @property
     def language_standard(self) -> int:
-        return self._json_data["compiler_settings"]["language_standard"]
+        return self._json_data['compiler_settings']['language_standard']
 
     @property
     def language_standard_required(self) -> bool:
-        return self._json_data["compiler_settings"]["language_standard_required"]
+        return self._json_data['compiler_settings']['language_standard_required']
 
 
 # ==========================================================================================================================
